@@ -6,6 +6,7 @@
 
 import { PrismaClient, Perfil, UserUnidadeRole, RunStatus, SubmissionStatus, OrcamentoStatus } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { refreshConsolidadoSnapshot, backfillAcuraciaSnapshots } from "../src/services/snapshot.service.js";
 
 const prisma = new PrismaClient();
 
@@ -269,48 +270,58 @@ async function main() {
 
   console.log("5/7  Criando ForecastOverrides (FCTS)...");
 
-  // Unidades com overrides completos em Jan e Fev (prontas para submissão/aprovação)
-  const OVERRIDE_CONFIG: { unidade: string; gestor: string; months: number[]; partialFeb?: boolean }[] = [
-    { unidade: "CARDIO",       gestor: "joao.silva@empresa.com",    months: [1, 2, 3] },
-    { unidade: "VASCULAR",     gestor: "maria.souza@empresa.com",   months: [1, 2] },
-    { unidade: "ENDOSCOPIA",   gestor: "pedro.oliveira@empresa.com",months: [1, 2] },
-    { unidade: "ENDOCIRURGIA", gestor: "carla.mendes@empresa.com",  months: [1] },
+  // Ciclos "fechados" (passados): Jan–Ago/2026 — histórico completo e aprovado em
+  // todas as unidades, para o Consolidado exibir a tendência plena do ano.
+  // Ciclo corrente (Set/2026): mistura de estágios do fluxo de aprovação PCP.
+  const CICLOS_FECHADOS = [1, 2, 3, 4, 5, 6, 7, 8];
+  const CICLO_CORRENTE  = 9;
+
+  const UNIDADES_GESTORES: { unidade: string; gestor: string }[] = [
+    { unidade: "CARDIO",       gestor: "joao.silva@empresa.com" },
+    { unidade: "VASCULAR",     gestor: "maria.souza@empresa.com" },
+    { unidade: "ENDOSCOPIA",   gestor: "pedro.oliveira@empresa.com" },
+    { unidade: "ENDOCIRURGIA", gestor: "carla.mendes@empresa.com" },
   ];
 
   let overrideCount = 0;
-  for (const cfg of OVERRIDE_CONFIG) {
-    const gestorId  = userMap[cfg.gestor];
-    const unidadeId = unidadeMap[cfg.unidade];
-    const unitProds = PRODUTOS.filter(p => p.unidade === cfg.unidade);
 
-    for (const cycleMonth of cfg.months) {
-      const runId      = runMap[cycleMonth];
-      // Alvo: primeiro mês da janela do ciclo (windowStart)
-      const targetDate = runWindowStart[cycleMonth];
+  async function criarOverridesCiclo(unidade: string, gestor: string, cycleMonth: number) {
+    const gestorId  = userMap[gestor];
+    const unidadeId = unidadeMap[unidade];
+    const unitProds = PRODUTOS.filter(p => p.unidade === unidade);
+    const runId      = runMap[cycleMonth];
+    // Alvo: primeiro mês da janela do ciclo (windowStart)
+    const targetDate = runWindowStart[cycleMonth];
 
-      for (const [pIdx, p] of unitProds.entries()) {
-        // Busca o item para o primeiro mês da janela
-        const item = await prisma.forecastItem.findFirst({
-          where: {
-            runId,
-            produtoId:      prodMap[p.codigo],
-            unidadeVendaId: unidadeId,
-            month:          targetDate,
-          },
-        });
-        if (!item) continue;
+    for (const [pIdx, p] of unitProds.entries()) {
+      // Busca o item para o primeiro mês da janela
+      const item = await prisma.forecastItem.findFirst({
+        where: {
+          runId,
+          produtoId:      prodMap[p.codigo],
+          unidadeVendaId: unidadeId,
+          month:          targetDate,
+        },
+      });
+      if (!item) continue;
 
-        const seasonal = SEASONAL[targetDate.getUTCMonth()];
-        const fcts     = rnd(Math.round(p.base * seasonal), pIdx + cycleMonth * 50, 0.09);
+      const seasonal = SEASONAL[targetDate.getUTCMonth()];
+      const fcts     = rnd(Math.round(p.base * seasonal), pIdx + cycleMonth * 50, 0.09);
 
-        await prisma.forecastOverride.upsert({
-          where: { forecastItemId: item.id },
-          create: { forecastItemId: item.id, gestorId, volumeFCTS: fcts },
-          update: {},
-        });
-        overrideCount++;
-      }
+      await prisma.forecastOverride.upsert({
+        where: { forecastItemId: item.id },
+        create: { forecastItemId: item.id, gestorId, volumeFCTS: fcts },
+        update: {},
+      });
+      overrideCount++;
     }
+  }
+
+  for (const { unidade, gestor } of UNIDADES_GESTORES) {
+    for (const cycleMonth of CICLOS_FECHADOS) {
+      await criarOverridesCiclo(unidade, gestor, cycleMonth);
+    }
+    await criarOverridesCiclo(unidade, gestor, CICLO_CORRENTE);
   }
   console.log(`     ✔ ${overrideCount} overrides criados.`);
 
@@ -318,23 +329,38 @@ async function main() {
 
   console.log("6/7  Criando DivisionSubmissions...");
 
-  const SUBMISSIONS: {
+  type SubmissionDef = {
     unidade: string; month: number; gestor: string;
-    status: SubmissionStatus; revisor?: string; rejectionReason?: string
-  }[] = [
-    // CARDIO — Jan aprovado, Fev aprovado, Mar em andamento
-    { unidade: "CARDIO",       month: 1, gestor: "joao.silva@empresa.com",    status: "APPROVED",  revisor: "ana.lima@empresa.com" },
-    { unidade: "CARDIO",       month: 2, gestor: "joao.silva@empresa.com",    status: "APPROVED",  revisor: "ana.lima@empresa.com" },
-    // VASCULAR — Jan aprovado, Fev pendente
-    { unidade: "VASCULAR",     month: 1, gestor: "maria.souza@empresa.com",   status: "APPROVED",  revisor: "ana.lima@empresa.com" },
-    { unidade: "VASCULAR",     month: 2, gestor: "maria.souza@empresa.com",   status: "SUBMITTED" },
-    // ENDOSCOPIA — Jan aprovado, Fev rejeitado
-    { unidade: "ENDOSCOPIA",   month: 1, gestor: "pedro.oliveira@empresa.com",status: "APPROVED",  revisor: "roberto.ferreira@empresa.com" },
-    { unidade: "ENDOSCOPIA",   month: 2, gestor: "pedro.oliveira@empresa.com",status: "REJECTED",  revisor: "roberto.ferreira@empresa.com",
+    status: SubmissionStatus; revisor?: string; rejectionReason?: string;
+  };
+
+  // Revisor histórico por unidade (perfil "consulta" hoje — ver CLAUDE.md: o
+  // perfil "controladoria" foi descontinuado, quem aprova agora é o PCP; estes
+  // registros só preservam a autoria histórica das aprovações já ocorridas).
+  const REVISOR_HISTORICO: Record<string, string> = {
+    CARDIO:       "ana.lima@empresa.com",
+    VASCULAR:     "ana.lima@empresa.com",
+    ENDOSCOPIA:   "roberto.ferreira@empresa.com",
+    ENDOCIRURGIA: "ana.lima@empresa.com",
+  };
+
+  const SUBMISSIONS: SubmissionDef[] = [];
+
+  // Ciclos fechados (Jan–Ago/2026): histórico completo e aprovado em todas as unidades.
+  for (const { unidade, gestor } of UNIDADES_GESTORES) {
+    for (const month of CICLOS_FECHADOS) {
+      SUBMISSIONS.push({ unidade, month, gestor, status: "APPROVED", revisor: REVISOR_HISTORICO[unidade] });
+    }
+  }
+
+  // Ciclo corrente (Set/2026): mistura de estágios do fluxo de aprovação PCP.
+  SUBMISSIONS.push(
+    { unidade: "CARDIO",     month: CICLO_CORRENTE, gestor: "joao.silva@empresa.com",     status: "APPROVED",  revisor: "ana.lima@empresa.com" },
+    { unidade: "VASCULAR",   month: CICLO_CORRENTE, gestor: "maria.souza@empresa.com",    status: "SUBMITTED" },
+    { unidade: "ENDOSCOPIA", month: CICLO_CORRENTE, gestor: "pedro.oliveira@empresa.com", status: "REJECTED",  revisor: "roberto.ferreira@empresa.com",
       rejectionReason: "Volumes FCTS acima do ORC sem justificativa técnica. Revisar produtos END30003 e END30004." },
-    // ENDOCIRURGIA — Jan aprovado, Fev rascunho (não submetido)
-    { unidade: "ENDOCIRURGIA", month: 1, gestor: "carla.mendes@empresa.com",  status: "APPROVED",  revisor: "ana.lima@empresa.com" },
-  ];
+    // ENDOCIRURGIA — Set em rascunho (não submetido): sem entrada aqui de propósito.
+  );
 
   const subDate = (year: number, month: number, day: number) =>
     new Date(Date.UTC(year, month - 1, day));
@@ -373,8 +399,7 @@ async function main() {
   let vendaCount = 0;
   const HISTORY_MONTHS: { year: number; month: number }[] = [
     ...Array.from({ length: 12 }, (_, i) => ({ year: 2025, month: i + 1 })),
-    { year: 2026, month: 1 },
-    { year: 2026, month: 2 },
+    ...Array.from({ length: 8 },  (_, i) => ({ year: 2026, month: i + 1 })), // Jan–Ago/2026
   ];
 
   for (const { year, month } of HISTORY_MONTHS) {
@@ -481,6 +506,18 @@ async function main() {
   // Nota: availableFrom é deixado como null em todos os runs.
   // A disponibilidade de cada ciclo é calculada dinamicamente pela regra global (SystemConfig.cycleOpenDay).
   // Administradores podem sobrescrever via painel "Gestão de Ciclos" na tela de administração.
+
+  // ── Snapshots de Consolidado/Acurácia ─────────────────────────────────────
+  //
+  // O Consolidado e o Dashboard leem das tabelas pré-computadas
+  // (ConsolidadoMesSnapshot / ConsolidadoProdutoMesSnapshot / AcuraciaSnapshot),
+  // não diretamente de ForecastItem/VendaMensal/OrcamentoItem — ver snapshot.service.ts.
+  // Sem este passo, os dados fictícios acima ficariam invisíveis nessas telas até
+  // o próximo boot do backend encontrar as tabelas vazias.
+  console.log("10. Recalculando snapshots (Consolidado + Acurácia)...");
+  await refreshConsolidadoSnapshot(2026);
+  await backfillAcuraciaSnapshots();
+  console.log("     ✔ Snapshots recalculados.");
 
   // ── Sumário ───────────────────────────────────────────────────────────────
 
