@@ -15,7 +15,7 @@ export const list = async (req: AuthRequest, res: Response) => {
       return res.json({ gate: current?.gate ?? "PENDING", refMonth: currentRefMonth });
     }
 
-    if (perfil === "controladoria") {
+    if (perfil === "consulta") {
       return res.json(
         logs.slice(0, 3).map((l) => ({ gate: l.gate, refMonth: l.refMonth }))
       );

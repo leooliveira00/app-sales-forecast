@@ -278,7 +278,7 @@ export const DashboardPage: React.FC = () => {
       })
     : null;
 
-  // ── Métricas PCP (admin/controladoria) ─────────────────────────────────
+  // ── Métricas PCP (admin/consulta) ─────────────────────────────────
 
   // Total de unidades activas vem do summary (backend) — não depende de submissions históricas
   const totalUnidades = summary?.totalUnidadesAtivas ?? 0;
@@ -504,7 +504,7 @@ export const DashboardPage: React.FC = () => {
               </>
             ) : (
               <>
-                {/* Controladoria — Card 1: Progresso do Ciclo */}
+                {/* PCP — Card 1: Progresso do Ciclo */}
                 {(() => {
                   const submitted  = unidadesNoMes.size;
                   const pct        = totalUnidades > 0 ? (submitted / totalUnidades) * 100 : 0;
@@ -557,7 +557,7 @@ export const DashboardPage: React.FC = () => {
                   );
                 })()}
 
-                {/* Controladoria — Card 2: Pendentes de Aprovação */}
+                {/* PCP — Card 2: Pendentes de Aprovação */}
                 <button
                   onClick={() => navigate('/aprovacoes')}
                   className={cn(
@@ -608,8 +608,8 @@ export const DashboardPage: React.FC = () => {
                   )}
                 </button>
 
-                {/* Controladoria — Card 3: Aprovadas */}
-                {/* Controladoria — Card 3: Taxa de Aprovação Direta */}
+                {/* PCP — Card 3: Aprovadas */}
+                {/* PCP — Card 3: Taxa de Aprovação Direta */}
                 {(() => {
                   const subsDoAno = submissions.filter(s => {
                     const d = new Date(s.refMonth);
@@ -681,7 +681,7 @@ export const DashboardPage: React.FC = () => {
                   );
                 })()}
 
-                {/* Controladoria — Card 4: Acurácia Global 3M */}
+                {/* PCP — Card 4: Acurácia Global 3M */}
                 <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm transition-all duration-200 hover:shadow-md hover:border-slate-300">
                   <div className="flex items-start justify-between mb-4">
                     <div className={cn(
@@ -736,7 +736,7 @@ export const DashboardPage: React.FC = () => {
             )}
           </div>
 
-          {/* PCP — Segunda linha de cards (apenas admin/controladoria) */}
+          {/* PCP — Segunda linha de cards (apenas admin/consulta) */}
           {!isGestor && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -870,7 +870,7 @@ export const DashboardPage: React.FC = () => {
             </div>
           )}
 
-          {/* Card Produtos Crônicos — admin/controladoria */}
+          {/* Card Produtos Crônicos — admin/consulta */}
           {!isGestor && cronicos.length > 0 && (() => {
             // Índice de atingimento: desvio=(fcts/vendas-1)*100 → ating=100/(1+desvio/100)
             const atingimento = (c: ProdutoCronico) => {

@@ -83,7 +83,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggle, mobileOpe
 
   // Pending submissions badge
   useEffect(() => {
-    if (!token || perfil === 'gestor' || perfil === 'controladoria' || perfil === 'consulta') return;
+    if (!token || !isAdminRole) return;
     const fetch_ = () =>
       fetch('/api/submissions/pending-count', { headers: { Authorization: `Bearer ${token}` } })
         .then(r => r.ok ? r.json() : { count: 0 })
@@ -117,13 +117,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggle, mobileOpe
   // ── Item definitions ──────────────────────────────────────────────────────────
 
   const analiseItems: NavItemDef[] = [
-    { icon: LayoutDashboard, label: t('nav.dashboard'),   path: '/dashboard',    roles: ['gestor', 'controladoria', 'operador_pcp', 'admin_ti', 'consulta'] },
+    { icon: LayoutDashboard, label: t('nav.dashboard'),   path: '/dashboard',    roles: ['gestor', 'operador_pcp', 'admin_ti', 'consulta'] },
     { icon: TrendingUp,      label: t('nav.myForecast'),  path: '/meu-forecast', roles: ['gestor'] },
-    { icon: BarChart3,       label: t('nav.consolidado'), path: '/consolidado',  roles: ['gestor', 'controladoria', 'operador_pcp', 'admin_ti', 'consulta'] },
+    { icon: BarChart3,       label: t('nav.consolidado'), path: '/consolidado',  roles: ['gestor', 'operador_pcp', 'admin_ti', 'consulta'] },
   ];
 
   const operacaoItems: NavItemDef[] = [
-    { icon: ClipboardCheck, label: t('nav.aprovacoes'), path: '/aprovacoes',      roles: ['controladoria', 'operador_pcp', 'admin_ti'], badge: pendingCount },
+    { icon: ClipboardCheck, label: t('nav.aprovacoes'), path: '/aprovacoes',      roles: ['operador_pcp', 'admin_ti'], badge: pendingCount },
     { icon: Activity,       label: t('nav.ciclos'),     path: '/cycle-readiness', roles: ['operador_pcp', 'admin_ti'], alertBadge: cycleAlert },
   ];
 

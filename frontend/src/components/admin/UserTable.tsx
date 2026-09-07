@@ -101,14 +101,12 @@ export const UserTable: React.FC<UserTableProps> = ({
                     "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase border",
                     u.perfil === 'operador_pcp'  ? "bg-purple-50  text-purple-600  border-purple-100"  :
                     u.perfil === 'admin_ti'      ? "bg-indigo-50  text-indigo-600  border-indigo-100"  :
-                    u.perfil === 'controladoria' ? "bg-amber-50   text-amber-600   border-amber-100"   :
                     u.perfil === 'consulta'      ? "bg-slate-100  text-slate-500   border-slate-200"  :
                                                    "bg-sky-50     text-sky-600     border-sky-100"
                   )}>
                     {u.perfil === 'gestor'        ? 'Gerente'
                     : u.perfil === 'operador_pcp' ? 'Operador PCP'
                     : u.perfil === 'admin_ti'     ? 'Adm. TI'
-                    : u.perfil === 'controladoria'? 'Controladoria'
                     : u.perfil === 'consulta'     ? 'Consulta'
                     : u.perfil}
                   </span>

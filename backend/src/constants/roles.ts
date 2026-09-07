@@ -1,6 +1,5 @@
 export const ROLES = {
   GESTOR:        "gestor",
-  CONTROLADORIA: "controladoria",
   OPERADOR_PCP:  "operador_pcp",
   ADMIN_TI:      "admin_ti",
   /** Somente leitura — nenhuma rota de mutação aceita este perfil. */

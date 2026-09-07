@@ -41,7 +41,7 @@ router.get("/desvios",           ForecastController.getDesviosCriticos);
 router.get("/tendencia",         ForecastController.getUnitTendencia);
 
 // Acurácia por unidade
-router.get("/acuracia-unidades", requireRole("operador_pcp", "admin_ti", "gestor", "controladoria", "consulta"), ForecastController.getAcuraciaUnidades);
+router.get("/acuracia-unidades", requireRole("operador_pcp", "admin_ti", "gestor", "consulta"), ForecastController.getAcuraciaUnidades);
 
 // Produtos crónicos (desvio persistente em N ciclos)
 router.get("/produtos-cronicos", ForecastController.getProdutosCronicos);

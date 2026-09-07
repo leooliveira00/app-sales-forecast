@@ -7,7 +7,7 @@ const router = Router();
 
 router.use(authenticate);
 
-router.get("/",                                    requireRole("operador_pcp", "admin_ti", "controladoria"), UsersController.getAll);
+router.get("/",                                    requireRole("operador_pcp", "admin_ti"),                  UsersController.getAll);
 router.post("/",                                   requireRole("operador_pcp", "admin_ti"),                  UsersController.create);
 router.put("/:id",                                 requireRole("operador_pcp", "admin_ti"),                  UsersController.update);
 router.delete("/:id",                              requireRole("operador_pcp", "admin_ti"),                  UsersController.remove);

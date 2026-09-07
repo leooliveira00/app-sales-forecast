@@ -44,7 +44,7 @@ export async function getSuccessRunMap(): Promise<Map<string, Date>> {
 /**
  * Lista os runs de forecast.
  *
- * Para gestores e controladoria, filtra pelo dia de abertura configurável:
+ * Para gestores e consulta, filtra pelo dia de abertura configurável:
  *  - Se o run tiver `availableFrom` definido (override do Airflow), usa esse valor.
  *  - Caso contrário, calcula a data de abertura com base em `cycleOpenDay`
  *    (ex.: dia 5 do mês de referência do ciclo).
@@ -70,7 +70,7 @@ export const listRuns = async (options?: {
 
   if (isAdmin) return allRuns;
 
-  // For gestor/controladoria two visibility rules apply (OR logic):
+  // For gestor/consulta two visibility rules apply (OR logic):
   //
   // 1. OPEN WINDOW — cycle is currently open for editing:
   //    - If availableFrom IS SET: gate (9999-12-31 = blocked/not yet open)

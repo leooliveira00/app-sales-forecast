@@ -125,7 +125,7 @@ const mesDeDate = (d: Date): string => d.toISOString().substring(0, 7);
  * Unidades que este usuário pode extrair.
  *
  * O gestor fica restrito às unidades vinculadas a ele (`unidadeCodigos` do JWT);
- * controladoria e administração alcançam todas as ativas. Uma unidade pedida
+ * consulta e administração alcançam todas as ativas. Uma unidade pedida
  * fora do escopo é descartada silenciosamente — o filtro nunca amplia o acesso.
  */
 export const resolverUnidadesAutorizadas = async (

@@ -96,10 +96,11 @@ export const submit = async (id: string, autorId: string) => {
 
   appCache.invalidateConsolidado();
 
-  // Notifica controladoria e admins sobre nova submissão pendente de aprovação
+  // Notifica PCP/admins sobre nova submissão pendente de aprovação
+  // (controladoria tem acesso somente de visualização — não decide submissões)
   const notifTitle = `Forecast submetido — ${result.unidadeVenda?.descricao ?? result.unidadeVendaId}`;
   const notifBody  = `A unidade ${result.unidadeVenda?.descricao ?? result.unidadeVendaId} submeteu o forecast de ${monthLabel(result.refMonth)} para aprovação.`;
-  for (const perfil of ["controladoria", "operador_pcp", "admin_ti"] as const) {
+  for (const perfil of ["operador_pcp", "admin_ti"] as const) {
     void createForRole(perfil, "SUBMISSION_PENDING", notifTitle, notifBody, result.refMonth)
       .catch(console.error);
   }
@@ -915,7 +916,7 @@ export const autoSubmitExpiredDrafts = async (refMonth: Date): Promise<{ submitt
 
   if (submitted.length > 0) {
     const label = monthLabel(refMonth);
-    for (const perfil of ["controladoria", "operador_pcp", "admin_ti"] as const) {
+    for (const perfil of ["operador_pcp", "admin_ti"] as const) {
       void createForRole(
         perfil,
         "SUBMISSION_PENDING",

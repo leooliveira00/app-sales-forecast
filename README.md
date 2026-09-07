@@ -18,7 +18,7 @@ um fluxo único com estado, papéis e trilha de auditoria:
 
 1. **Gestores** de cada unidade de venda preenchem os volumes mensais previstos
    (FCTS) por produto, com sugestão inicial gerada por modelos de série temporal.
-2. **Controladoria** revisa e aprova ou rejeita a submissão de cada unidade.
+2. **PCP** revisa e aprova ou rejeita a submissão de cada unidade.
 3. Um motor de **forecast por IA** (rodando em Airflow) recalcula periodicamente as
    projeções, testando múltiplos modelos por série e escolhendo o de menor erro.
 4. Dashboards consolidados comparam Orçado × Forecast × Vendas realizadas, com
@@ -45,8 +45,9 @@ um fluxo único com estado, papéis e trilha de auditoria:
 - **Trilha de auditoria append-only** — toda mutação relevante (quem, o quê, antes
   e depois) é registrada para rastreabilidade.
 - **Multi-idioma** — interface em português, inglês e espanhol.
-- **Perfis de acesso** — gestor, controladoria, operador de PCP e administrador de
-  TI, com controle de acesso reforçado no backend (o frontend só reflete a UX).
+- **Perfis de acesso** — gestor, consulta (somente leitura), operador de PCP e
+  administrador de TI, com controle de acesso reforçado no backend (o frontend só
+  reflete a UX).
 - **Integração bidirecional com ERP** — exemplo de sincronização com um ERP externo
   (produtos, vendas) e exportação dos resultados de volta, orquestrada por DAGs
   do Airflow.
@@ -143,7 +144,7 @@ Login de exemplo criado pelo seed:
 |---|---|---|
 | Administrador (TI) | `admin@empresa.com` | `admin123` |
 | Gestor | `joao.silva@empresa.com` | `gestor123` |
-| Controladoria | `ana.lima@empresa.com` | `controle123` |
+| Consulta | `ana.lima@empresa.com` | `controle123` |
 
 Acesse em **http://localhost:8080**.
 
@@ -180,9 +181,9 @@ ambientes, etc.) estão documentados em [CLAUDE.md](CLAUDE.md).
 | Perfil | Acesso |
 |---|---|
 | `gestor` | Submete o forecast da(s) unidade(s) de venda em que atua |
-| `controladoria` | Aprova/rejeita submissões de todas as unidades |
-| `operador_pcp` | Administra produtos, integrações e configuração de ciclo |
+| `operador_pcp` | Aprova/rejeita submissões de todas as unidades; administra produtos, integrações e configuração de ciclo |
 | `admin_ti` | Administração completa (usuários, unidades, configurações) |
+| `consulta` | Somente leitura — Dashboard e Consolidado de todas as unidades, sem ações de mutação |
 
 A autorização é sempre reforçada no backend — o frontend apenas oculta/redireciona
 por conveniência de UX.

@@ -37,8 +37,8 @@ const USERS = [
   { email: "maria.souza@empresa.com",  nome: "Maria Souza",         perfil: "gestor" as Perfil,       senha: "gestor123", unidade: "VASCULAR" },
   { email: "pedro.oliveira@empresa.com",nome: "Pedro Oliveira",     perfil: "gestor" as Perfil,       senha: "gestor123", unidade: "ENDOSCOPIA" },
   { email: "carla.mendes@empresa.com", nome: "Carla Mendes",        perfil: "gestor" as Perfil,       senha: "gestor123", unidade: "ENDOCIRURGIA" },
-  { email: "ana.lima@empresa.com",     nome: "Ana Lima",            perfil: "controladoria" as Perfil, senha: "controle123", unidade: null },
-  { email: "roberto.ferreira@empresa.com", nome: "Roberto Ferreira", perfil: "controladoria" as Perfil, senha: "controle123", unidade: null },
+  { email: "ana.lima@empresa.com",     nome: "Ana Lima",            perfil: "consulta" as Perfil, senha: "controle123", unidade: null },
+  { email: "roberto.ferreira@empresa.com", nome: "Roberto Ferreira", perfil: "consulta" as Perfil, senha: "controle123", unidade: null },
 ];
 
 type ProdDef = { codigo: string; descricao: string; unidade: string; familia: string; classe: string; base: number };
@@ -317,9 +317,6 @@ async function main() {
   // ── 6. DivisionSubmissions ────────────────────────────────────────────────
 
   console.log("6/7  Criando DivisionSubmissions...");
-
-  const analistaId   = userMap["ana.lima@empresa.com"];
-  const controladoria2 = userMap["roberto.ferreira@empresa.com"];
 
   const SUBMISSIONS: {
     unidade: string; month: number; gestor: string;

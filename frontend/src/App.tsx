@@ -45,7 +45,7 @@ const RequirePerfil: React.FC<{ roles: string[]; children: React.ReactNode }> = 
 };
 
 const GESTOR_ONLY  = ['gestor'];
-const APROVACOES   = ['controladoria', 'operador_pcp', 'admin_ti'];
+const APROVACOES   = ['operador_pcp', 'admin_ti'];
 const ADMIN        = ['operador_pcp', 'admin_ti'];
 const ADMIN_TI     = ['admin_ti'];
 

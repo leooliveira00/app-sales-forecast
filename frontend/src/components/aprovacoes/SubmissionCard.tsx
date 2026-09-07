@@ -61,7 +61,7 @@ export const SubmissionCard: React.FC<SubmissionCardProps> = ({ sub, token, onAc
    * reject já o recusam no backend; esconder aqui evita oferecer uma ação que
    * resultaria em 403.
    */
-  const canDecide = ['controladoria', 'operador_pcp', 'admin_ti'].includes(user?.perfil ?? '');
+  const canDecide = ['operador_pcp', 'admin_ti'].includes(user?.perfil ?? '');
 
   const cfg = statusConfig[sub.status];
 

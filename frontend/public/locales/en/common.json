@@ -35,7 +35,6 @@
   },
   "roles": {
     "gestor": "Manager",
-    "controladoria": "Controlling",
     "operador_pcp": "PCP Operator",
     "admin_ti": "IT Administrator",
     "consulta": "Read-only"

@@ -13,9 +13,9 @@ router.get("/by-unit",        SubmissionController.getByUnitAndMonth);
 // Gestor submete
 router.post("/", requireRole("gestor"), SubmissionController.submit);
 
-// Controladoria/operador_pcp decide
-router.patch("/:id/approve",  requireRole("controladoria", "operador_pcp", "admin_ti"), SubmissionController.approve);
-router.patch("/:id/reject",   requireRole("controladoria", "operador_pcp", "admin_ti"), SubmissionController.reject);
-router.get("/:id/preview",    requireRole("controladoria", "operador_pcp", "admin_ti"), SubmissionController.getPreview);
+// PCP/admin_ti decide (controladoria tem acesso somente de visualização — Dashboard/Consolidado)
+router.patch("/:id/approve",  requireRole("operador_pcp", "admin_ti"), SubmissionController.approve);
+router.patch("/:id/reject",   requireRole("operador_pcp", "admin_ti"), SubmissionController.reject);
+router.get("/:id/preview",    requireRole("operador_pcp", "admin_ti"), SubmissionController.getPreview);
 
 export default router;

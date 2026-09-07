@@ -35,7 +35,6 @@
   },
   "roles": {
     "gestor": "Gerente",
-    "controladoria": "Contraloría",
     "operador_pcp": "Operador PCP",
     "admin_ti": "Administrador TI",
     "consulta": "Consulta"

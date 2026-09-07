@@ -31,7 +31,7 @@ type ExtracaoDadosModalProps = {
   readonly token: string;
   /**
    * Unidade que já vem selecionada — a do gestor no Consolidado dele. Na visão
-   * corporativa (controladoria/PCP/TI) não existe unidade ativa: passe vazio e
+   * corporativa (consulta/PCP/TI) não existe unidade ativa: passe vazio e
    * o modal começa com todas as unidades autorizadas marcadas.
    */
   readonly unidadeAtiva?: string;

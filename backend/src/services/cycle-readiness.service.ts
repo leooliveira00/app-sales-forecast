@@ -516,7 +516,7 @@ export const closeCycle = async (
   });
   if (submittedCount > 0) {
     throw Object.assign(
-      new Error(`Existem ${submittedCount} submissão(ões) aguardando aprovação da Controladoria. Aprove ou rejeite antes de encerrar o ciclo.`),
+      new Error(`Existem ${submittedCount} submissão(ões) aguardando aprovação do PCP. Aprove ou rejeite antes de encerrar o ciclo.`),
       { code: "SUBMITTED_OPEN" }
     );
   }

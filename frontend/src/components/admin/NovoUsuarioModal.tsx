@@ -6,7 +6,6 @@ import type { DropdownOption } from '../shared/Dropdown';
 /** Perfis atribuíveis — mesma ordem do enum Perfil no schema. */
 export const PERFIS: ReadonlyArray<DropdownOption> = [
   { valor: 'gestor',        rotulo: 'Gerente' },
-  { valor: 'controladoria', rotulo: 'Controladoria' },
   { valor: 'consulta',      rotulo: 'Consulta' },
   { valor: 'operador_pcp',  rotulo: 'Operador PCP' },
   { valor: 'admin_ti',      rotulo: 'Administrador TI' },
