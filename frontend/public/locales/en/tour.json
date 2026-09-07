@@ -1,0 +1,92 @@
+{
+  "buttons": {
+    "back": "Back",
+    "close": "Close",
+    "last": "Finish",
+    "next": "Next",
+    "nextWithProgress": "Next ({current} of {total})",
+    "skip": "Skip tour",
+    "open": "Open tour",
+    "start": "Guided tour"
+  },
+  "gestor": {
+    "welcome": {
+      "title": "Welcome to Sales Forecast Web! 👋",
+      "content": "This quick guide will walk you through the main features of the system. It takes less than 2 minutes."
+    },
+    "cycle": {
+      "title": "Current Cycle",
+      "content": "Use the arrows to navigate between monthly cycles. The active cycle is where you fill in your sales volumes."
+    },
+    "kpiBar": {
+      "title": "Unit Indicators",
+      "content": "Track your progress: confirmed FCST volumes, Budget target, product families, and percentage of filled SKUs."
+    },
+    "products": {
+      "title": "Product Portfolio",
+      "content": "Products are grouped by family. Click a family to expand it and edit monthly volumes individually."
+    },
+    "submit": {
+      "title": "Submit Forecast",
+      "content": "Once all volumes are filled in, submit for PPC approval. The system will show a summary before confirming."
+    },
+    "consolidadoWindow": {
+      "title": "Analysis Window",
+      "content": "Use the presets (3M, 6M, 12M) or the arrows to define the historical analysis period."
+    },
+    "consolidadoKpis": {
+      "title": "Performance Indicators",
+      "content": "Forecast Bias, FCST/Budget attainment, realized sales, and accuracy for the period — all in one panel."
+    },
+    "consolidadoTabs": {
+      "title": "Division Analysis",
+      "content": "The Division tab shows the breakdown by product family. The Chronics tab lists products with recurring deviations."
+    },
+    "help": {
+      "title": "Help Center 💡",
+      "content": "All set! Whenever you have questions, click the help icon (?) at the top of the screen. There you'll find step-by-step guides, the glossary, training videos and the full manual."
+    }
+  },
+  "pcp": {
+    "welcome": {
+      "title": "Welcome to Sales Forecast Web! 👋",
+      "content": "This quick guide will show you the main monitoring features of the system. It takes less than 2 minutes."
+    },
+    "dashboardKpis": {
+      "title": "Control Panel",
+      "content": "Monitor cycle progress: how many units have submitted, pending approvals, and global accuracy."
+    },
+    "aprovacoesList": {
+      "title": "Pending Approvals",
+      "content": "Here are all forecast submissions awaiting approval. Review the volumes before approving or rejecting."
+    },
+    "aprovacoesFilter": {
+      "title": "Approval Filters",
+      "content": "Filter by reference month, sales unit, or status to quickly locate items requiring attention."
+    },
+    "consolidadoWindow": {
+      "title": "Analysis Window",
+      "content": "Set the analysis period using presets (3M, 6M, 12M) or select months manually with the arrows."
+    },
+    "consolidadoKpis": {
+      "title": "Consolidated Indicators",
+      "content": "Track Bias, FCST vs Budget, Sales, and forecast Accuracy for all units in the selected period."
+    },
+    "consolidadoChart": {
+      "title": "Cycle Evolution",
+      "content": "The chart shows the monthly evolution of Budget, FCST, and Sales to track trends over time."
+    },
+    "consolidadoTabs": {
+      "title": "Division Breakdown",
+      "content": "In the Divisions tab, expand each sales unit to see the detail by product family and country."
+    },
+    "help": {
+      "title": "Help Center 💡",
+      "content": "Whenever you need, click the help icon (?) at the top of the screen to open the Help Center — with guides, glossary, videos and the full manual."
+    },
+    "done": {
+      "title": "Tour complete! 🎉",
+      "content": "You've explored the main screens. Use the \"Guided tour\" button in the sidebar at any time to revisit this guide."
+    }
+  }
+}

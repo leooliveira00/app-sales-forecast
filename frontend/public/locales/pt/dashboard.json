@@ -1,0 +1,121 @@
+{
+  "title": "Dashboard",
+  "cards": {
+    "criticalDeviations": "Desvios Críticos",
+    "filledProducts": "Produtos Preenchidos",
+    "monthStatus": "Status do Mês",
+    "cycleProgress": "Progresso do Ciclo",
+    "pendingApproval": "Pendentes de Aprovação",
+    "globalAccuracy": "Acurácia Global 3M",
+    "unitAccuracy": "Acurácia da Unidade 3M",
+    "unitsWithoutSubmission": "Unidades sem Submissão",
+    "fctsOrcDeviation": "Desvio FCST/ORC (ciclo)",
+    "approvalRate": "Taxa de Aprovação Direta"
+  },
+  "labels": {
+    "skus": "SKUs",
+    "allWithinLimit": "Todos dentro do limite",
+    "noData": "Sem dados",
+    "waitingRealSales": "Aguardando vendas reais",
+    "allSubmitted": "Todas submeteram",
+    "allUnitsSubmitted": "Todas as unidades submeteram",
+    "noPendingUnits": "Nenhuma unidade pendente no ciclo atual.",
+    "noDeviations": "Nenhum desvio crítico no momento",
+    "noDeviation": "Dentro do limite",
+    "deviation": {
+      "ok": "Dentro do limite",
+      "warning": "Atenção",
+      "critical": "Crítico"
+    },
+    "noDataCycle": "Sem dados no ciclo",
+    "pending": "Pendentes",
+    "submitted": "Submetidas",
+    "noApprovalsYear": "Sem aprovações ou rejeições no ano",
+    "pendingSuffix_one": "{{count}} pendente",
+    "pendingSuffix_other": "{{count}} pendentes",
+    "allUnitsSubmittedDetail": "Todas as unidades submeteram · clique para detalhes",
+    "currentCycle": "Análise do ciclo atual",
+    "portfolioPct": "{{value}}% do portfólio",
+    "waiting": "aguardando",
+    "pendingSubmissions_zero": "nenhuma submissão aguardando",
+    "pendingSubmissions_one": "{{count}} submissão aguardando revisão",
+    "pendingSubmissions_other": "{{count}} submissões aguardando revisão",
+    "moreToReview": "+{{count}} mais → Ver aprovações",
+    "noRejections": "✓ sem rejeições",
+    "rework_one": "{{count}} retrabalho",
+    "rework_other": "{{count}} retrabalhos",
+    "approvalStats": "{{approved}} aprovadas · {{rejected}} rejeitadas em {{year}}",
+    "accuracyGood": "boa",
+    "accuracyRegular": "regular",
+    "accuracyCritical": "crítica",
+    "calculating": "calculando...",
+    "unitsAbove90": "{{above}} de {{total}} unidades ≥90%",
+    "seeMore": "ver →",
+    "unitsOf": "de {{total}} unidades no ciclo · clique para ver quais",
+    "overestimate": "sobre-estimativa em relação ao ORC",
+    "underestimate": "sub-estimativa em relação ao ORC",
+    "unitsWord_one": "unidade",
+    "unitsWord_other": "unidades",
+    "currentSubmission": "submissão atual",
+    "desvioThreshold": ">{{value}}% desvio",
+    "familiesCount_one": "{{count}} família · →",
+    "familiesCount_other": "{{count}} famílias · →",
+    "pendingBadge": "{{count}} pendente",
+    "pendingBadge_other": "{{count}} pendentes"
+  },
+  "rejection": {
+    "title": "Forecast Reprovado",
+    "reasonLabel": "Motivo da reprovação",
+    "reviewHint": "Revise os volumes e resubmeta o ciclo para corrigir."
+  },
+  "tendencia": {
+    "title": "Acurácia por Unidade",
+    "noData": "Dados de tendência indisponíveis.",
+    "noDataDetail": "A unidade ainda não possui histórico de ORC ou vendas.",
+    "waitingData": "Aguardando vendas reais e submissões de FCST.",
+    "deviationSubtitle": "Desvio médio FCST vs Vendas — últimos 3 ciclos válidos",
+    "chartTitle": "Evolução Últimos 12 Meses — Minha Unidade",
+    "subtitleMobile": "ORC × FCST × Vendas · Desvio",
+    "subtitleDesktop": "ORC × FCST (Forecast Confirmado) × Vendas Reais · Desvio FCST/Venda · Clique em qualquer ponto para detalhes",
+    "subtitleDesktopNoClick": "ORC × FCST (Forecast Confirmado) × Vendas Reais · Desvio FCST/Venda",
+    "deviationPct": "Desvio %",
+    "tooltipDeviation": "Desvio FCST/Venda:",
+    "desvioLegend": "verde ≤10% · amarelo 10–20% · vermelho >20%"
+  },
+  "drawer": {
+    "fctsVsSale": "Desvio FCST/Venda",
+    "achievementVsORC": "Atingimento vs ORC",
+    "skusAboveThreshold": "{{count}} SKUs acima de {{threshold}}% de desvio FCST/Venda A.A.",
+    "allWithinLimit": "Todos os SKUs estão dentro do limite de {{threshold}}%.",
+    "deviationDescription": "SKUs com desvio FCST/Venda A.A. acima de {{threshold}}%, agrupados por família.",
+    "maxDeviation": "máx {{value}}%",
+    "viewConsolidado": "Ver detalhes no Consolidado",
+    "pendingSubtitle": "{{count}} produto sem preenchimento",
+    "pendingSubtitle_other": "{{count}} produtos sem preenchimento",
+    "pendingDescription": "Produtos sem FCTS em nenhum mês da janela do ciclo. Preencha-os na tela de Forecast.",
+    "allFilled": "Tudo preenchido",
+    "allFilledDetail": "Todos os produtos do ciclo têm FCTS."
+  },
+  "legend": {
+    "orc": "ORC",
+    "fcts": "FCST",
+    "vendaAA": "Venda A.A.",
+    "vendas": "Vendas",
+    "subtitle": "ORC · FCST · Vendas · Desvio"
+  },
+  "actions": {
+    "goToForecast": "Ir ao Forecast →",
+    "goToApprovals": "Ir para Aprovações"
+  },
+  "cronicos": {
+    "persistentDeviation_one": "{{count}} produto com desvio persistente",
+    "persistentDeviation_other": "{{count}} produtos com desvio persistente",
+    "cycles": "3+ ciclos consecutivos",
+    "viewConsolidado": "Ver Consolidado →",
+    "achievement": "ating. {{value}}%"
+  },
+  "tooltips": {
+    "globalAccuracy": "Acurácia média ponderada pelo volume de vendas de todas as unidades nos últimos 3 meses. Calculado apenas com volumes confirmados pelo gestor em ciclos aprovados.",
+    "unitAccuracy": "Acurácia da sua unidade nos últimos 3 meses. Calculada apenas com volumes confirmados pelo gestor em ciclos aprovados."
+  }
+}

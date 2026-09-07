@@ -1,0 +1,43 @@
+{
+  "name": "sales-forecast-web-frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@google/genai": "^1.29.0",
+    "@tailwindcss/vite": "^4.1.14",
+    "@tanstack/react-query": "^5.90.21",
+    "axios": "^1.13.5",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "i18n-iso-countries": "^7.14.0",
+    "i18next": "^26.0.6",
+    "i18next-http-backend": "^3.0.5",
+    "lucide-react": "^0.546.0",
+    "motion": "^12.23.24",
+    "react": "^19.0.0",
+    "react-country-flag": "^3.1.0",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.71.2",
+    "react-i18next": "^17.0.4",
+    "react-joyride": "^3.1.0",
+    "react-router-dom": "^7.13.1",
+    "recharts": "^3.7.0",
+    "tailwind-merge": "^3.5.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^5.0.4",
+    "autoprefixer": "^10.4.21",
+    "tailwindcss": "^4.1.14",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
+  }
+}

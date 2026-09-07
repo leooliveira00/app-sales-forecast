@@ -1,0 +1,83 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "myForecast": "My Forecast",
+    "consolidado": "Consolidated",
+    "aprovacoes": "Approvals",
+    "ciclos": "Cycles",
+    "usuarios": "Users",
+    "unidades": "Units",
+    "produtos": "Products",
+    "configuracoes": "Settings",
+    "protheus": "Protheus",
+    "auditoria": "Audit",
+    "airflow": "Airflow",
+    "myAccount": "My Account",
+    "admin": "Administration"
+  },
+  "sections": {
+    "analise": "Analytics",
+    "operacao": "Operations",
+    "sistema": "System"
+  },
+  "sidebar": {
+    "expand": "Expand menu",
+    "collapse": "Collapse menu",
+    "unit": "Unit",
+    "activeUnit": "Active unit",
+    "logout": "Sign out"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications",
+    "clearAll": "Clear all",
+    "viewAll": "View all notifications",
+    "openMenu": "Open menu"
+  },
+  "help": {
+    "title": "Help Center"
+  },
+  "notifTypes": {
+    "CYCLE_OPENED":              { "title": "{{month}} cycle opened",                  "body": "The {{month}} cycle is now available for submission. Go to My Forecast to review and submit." },
+    "CYCLE_BLOCKED":             { "title": "{{month}} cycle blocked",                 "body": "The {{month}} cycle has been temporarily blocked by an administrator." },
+    "CYCLE_FAILED":              { "title": "Error in {{month}} cycle",                "body": "An error occurred while preparing the {{month}} cycle. Please wait for the IT team." },
+    "CYCLE_STUCK":               { "title": "{{month}} cycle blocked",                 "body": "The {{month}} cycle is waiting for action." },
+    "CYCLE_CLOSED":              { "title": "{{month}} cycle closed",                  "body": "The {{month}} cycle has been closed. Data remains available for consultation." },
+    "CYCLE_AWAITING_PREV_CLOSE": { "title": "{{month}} cycle awaiting previous close", "body": "The {{month}} cycle is waiting for the previous cycle's submissions to be finalized." },
+    "CYCLE_FULLY_APPROVED":      { "title": "Cycle fully approved",                    "body": "All submissions for the {{month}} cycle have been approved." },
+    "SUBMISSION_PENDING":        { "title": "Forecast submitted — {{unit}}" },
+    "SUBMISSION_APPROVED":       { "title": "Forecast approved — {{unit}}",  "body": "The {{month}} forecast for unit {{unit}} has been approved." },
+    "SUBMISSION_REJECTED":       { "title": "Forecast rejected — {{unit}}",  "body": "The {{month}} forecast for unit {{unit}} was rejected.", "bodyReason": "The {{month}} forecast for unit {{unit}} was rejected: {{reason}}." }
+  },
+  "notificationsPage": {
+    "title": "Notifications",
+    "description": "Notices about the opening and status of forecast cycles.",
+    "markAllRead": "Mark all as read",
+    "loading": "Loading…",
+    "empty": "No notifications yet.",
+    "emptyHint": "You will be notified when new cycles open."
+  },
+  "profile": {
+    "title": "My Account",
+    "sectionPhoto": "Profile Picture",
+    "changePhoto": "Change photo",
+    "savePhoto": "Save photo",
+    "removePhoto": "Remove photo",
+    "photoHint": "JPG, PNG or WEBP · Max. 2 MB",
+    "sectionData": "Account Details",
+    "labelName": "Display name",
+    "labelEmail": "E-mail",
+    "sectionPassword": "Change Password",
+    "labelCurrentPassword": "Current password",
+    "labelNewPassword": "New password",
+    "saveChanges": "Save changes",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "errorSave": "Error saving"
+  },
+  "header": {
+    "platformName": "Sales Forecast",
+    "platformSub": "Web",
+    "dateFormat": "MM/dd h:mm a"
+  }
+}

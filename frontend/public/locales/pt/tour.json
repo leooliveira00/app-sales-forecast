@@ -1,0 +1,92 @@
+{
+  "buttons": {
+    "back": "Voltar",
+    "close": "Fechar",
+    "last": "Concluir",
+    "next": "Próximo",
+    "nextWithProgress": "Próximo ({current} de {total})",
+    "skip": "Pular tour",
+    "open": "Abrir tour",
+    "start": "Tour guiado"
+  },
+  "gestor": {
+    "welcome": {
+      "title": "Bem-vindo ao Sales Forecast Web! 👋",
+      "content": "Este guia rápido vai mostrar as principais funcionalidades do sistema. Leva menos de 2 minutos."
+    },
+    "cycle": {
+      "title": "Ciclo Atual",
+      "content": "Use as setas para navegar entre os ciclos mensais. O ciclo ativo é onde você preenche os volumes de vendas."
+    },
+    "kpiBar": {
+      "title": "Indicadores da Unidade",
+      "content": "Acompanhe o progresso: volumes FCST confirmados, meta ORC, famílias de produto e percentual de SKUs preenchidos."
+    },
+    "products": {
+      "title": "Portfólio de Produtos",
+      "content": "Os produtos são agrupados por família. Clique na família para expandir e editar os volumes mensais individualmente."
+    },
+    "submit": {
+      "title": "Submeter o Forecast",
+      "content": "Quando todos os volumes estiverem preenchidos, submeta para aprovação do PCP. O sistema mostrará um resumo antes de confirmar."
+    },
+    "consolidadoWindow": {
+      "title": "Janela de Análise",
+      "content": "Use os presets (3M, 6M, 12M) ou as setas para definir o período de análise histórica."
+    },
+    "consolidadoKpis": {
+      "title": "Indicadores de Performance",
+      "content": "Bias do forecast, atingimento FCST/ORC, vendas realizadas e acurácia do período — tudo em um único painel."
+    },
+    "consolidadoTabs": {
+      "title": "Análises por Divisão",
+      "content": "A aba Divisão mostra o breakdown por família de produto. A aba Crônicos lista produtos com desvios recorrentes."
+    },
+    "help": {
+      "title": "Central de Ajuda 💡",
+      "content": "Pronto! Sempre que tiver dúvidas, clique no ícone de ajuda (?) no topo da tela. Lá você encontra guias passo a passo, o glossário dos termos, vídeos de treinamento e o manual completo."
+    }
+  },
+  "pcp": {
+    "welcome": {
+      "title": "Bem-vindo ao Sales Forecast Web! 👋",
+      "content": "Este guia rápido vai mostrar as principais funcionalidades de monitoramento do sistema. Leva menos de 2 minutos."
+    },
+    "dashboardKpis": {
+      "title": "Painel de Controle",
+      "content": "Monitore o progresso do ciclo: quantas unidades já submeteram, pendências de aprovação e acurácia global."
+    },
+    "aprovacoesList": {
+      "title": "Aprovações Pendentes",
+      "content": "Aqui estão todas as submissões de forecast aguardando aprovação. Revise os volumes antes de aprovar ou rejeitar."
+    },
+    "aprovacoesFilter": {
+      "title": "Filtros de Aprovação",
+      "content": "Filtre por mês de referência, unidade de venda ou status para localizar rapidamente o que precisa de atenção."
+    },
+    "consolidadoWindow": {
+      "title": "Janela de Análise",
+      "content": "Defina o período com os presets (3M, 6M, 12M) ou selecione meses manualmente com as setas."
+    },
+    "consolidadoKpis": {
+      "title": "Indicadores Consolidados",
+      "content": "Acompanhe Bias, FCST vs ORC, Vendas e Acurácia do forecast para todas as unidades no período selecionado."
+    },
+    "consolidadoChart": {
+      "title": "Evolução do Ciclo",
+      "content": "O gráfico mostra a evolução mensal de ORC, FCST e Vendas para acompanhar tendências ao longo do tempo."
+    },
+    "consolidadoTabs": {
+      "title": "Breakdown por Divisão",
+      "content": "Na aba Divisões, expanda cada unidade de venda para ver o detalhe por família de produto e por país."
+    },
+    "help": {
+      "title": "Central de Ajuda 💡",
+      "content": "Sempre que precisar, clique no ícone de ajuda (?) no topo da tela para abrir a Central de Ajuda — com guias, glossário, vídeos e o manual completo."
+    },
+    "done": {
+      "title": "Tour concluído! 🎉",
+      "content": "Você conheceu as principais telas do sistema. Use o botão \"Tour guiado\" no menu lateral a qualquer momento para revisitar este guia."
+    }
+  }
+}

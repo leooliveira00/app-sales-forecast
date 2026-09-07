@@ -1,0 +1,83 @@
+{
+  "title": "Centro de Ayuda",
+  "subtitle": "Manuales, términos y guías rápidas",
+  "close": "Cerrar",
+  "searchPlaceholder": "Buscar en la ayuda...",
+  "tabs": {
+    "guides": "Guías",
+    "glossary": "Glosario",
+    "videos": "Videos"
+  },
+  "noResults": "No se encontró nada para \"{{query}}\".",
+  "guidesEmpty": "Aún no hay guías disponibles para su perfil.",
+  "videosEmpty": "No hay videos disponibles por el momento.",
+  "videosComingSoon": "Próximamente...",
+  "videosComingSoonHint": "Las capacitaciones para unidades de exportación estarán disponibles pronto.",
+  "videoLoadError": "No se pudo cargar el video. Inténtelo de nuevo.",
+  "redoTour": "Repetir el tour guiado",
+  "manual": "Manual completo (PDF)",
+  "manualUrl": "/uploads/manuais/manual-pt.pdf",
+  "videos": [
+    { "slug": "introducao",   "title": "Introducción" },
+    { "slug": "dashboard",    "title": "Pantalla Dashboard" },
+    { "slug": "meu-forecast", "title": "Pantalla Mi Forecast" },
+    { "slug": "consolidado",  "title": "Pantalla Consolidado" }
+  ],
+  "glossary": [
+    { "term": "PRE (Presupuesto / ORC)", "def": "Presupuesto anual de volumen aprobado para cada producto y mes." },
+    { "term": "FCST (Pronóstico)", "def": "El pronóstico de demanda que usted ingresa para cada mes. Es el número que se enviará para aprobación." },
+    { "term": "Venta A.A. (Año Anterior)", "def": "Volumen efectivamente vendido en el mismo mes del año anterior. Sirve como base de comparación para evaluar su pronóstico." },
+    { "term": "Desviación", "def": "Diferencia porcentual entre el FCST y la referencia (Venta A.A.). Indica cuánto se aleja su pronóstico del histórico — verde hasta 5%, ámbar hasta 15%, rojo por encima de eso." },
+    { "term": "Ciclo de pronóstico", "def": "Ventana mensual en la que el pronóstico se abre para carga, revisión y envío. Cada ciclo cubre un rango de meses futuros." },
+    { "term": "Lead time", "def": "Anticipación, en meses, entre el ciclo actual y el período que se está pronosticando." },
+    { "term": "Vista consolidada (Todos los países)", "def": "En la pantalla Mi Pronóstico, en unidades de exportación, la opción \"Todos los países\" muestra la suma de todos los países. Es de solo lectura, para revisión — para editar, seleccione un país específico." },
+    { "term": "Sugerencia IA", "def": "Pronóstico generado automáticamente por modelos estadísticos. Puede aceptarse como punto de partida y ajustarse después." },
+    { "term": "Acciones rápidas", "def": "Atajos para completar varios meses a la vez: aceptar la sugerencia IA, usar promedio histórico, valor fijo, distribuir un total o ajustar por porcentaje." }
+  ],
+  "guides": {
+    "gestor": [
+      {
+        "id": "preencher-submeter",
+        "title": "Cómo completar y enviar su pronóstico",
+        "steps": [
+          "Seleccione el ciclo deseado en el selector de ciclo, en la parte superior de la pantalla Mi Pronóstico.",
+          "Expanda una familia y luego un producto para ver los meses.",
+          "Ingrese el volumen pronosticado (FCST) en cada mes. La desviación respecto a la venta del año anterior aparece al lado para orientarlo.",
+          "Si lo prefiere, use las Acciones rápidas para completar varios meses a la vez.",
+          "Revise los totales por familia y haga clic en \"Enviar Ciclo\" para mandarlo a aprobación."
+        ]
+      },
+      {
+        "id": "export-por-pais",
+        "title": "Unidades de exportación: pronóstico por país",
+        "steps": [
+          "En unidades de exportación, use el selector de país que está junto al selector de ciclo.",
+          "Al abrir, la pantalla ya viene posicionada en un país específico — complete su pronóstico normalmente.",
+          "La opción \"Todos los países\" es una vista consolidada de solo lectura (suma de todos los países), útil para revisión.",
+          "Para editar el pronóstico, agregar o quitar productos, seleccione siempre un país específico.",
+          "Repita la carga para cada país y envíe el ciclo al final."
+        ]
+      },
+      {
+        "id": "acoes-rapidas",
+        "title": "Usando las Acciones rápidas",
+        "steps": [
+          "Abra el menú \"Acciones rápidas\" en el encabezado de una familia.",
+          "Elija una opción: aceptar la sugerencia IA, completar con promedio (3, 6 o 12 meses), definir un valor fijo, distribuir un total o ajustar por porcentaje.",
+          "Revise la vista previa de los cambios antes de confirmar.",
+          "Después de aplicar, aún puede ajustar meses individualmente si es necesario."
+        ]
+      },
+      {
+        "id": "acompanhar-consolidado",
+        "title": "Siguiendo el consolidado",
+        "steps": [
+          "Acceda a la pantalla Consolidado para ver los totales agregados por unidad, familia y país.",
+          "Use el selector de ventana para cambiar el período analizado.",
+          "Compare FCST, PRE y Ventas lado a lado y observe las desviaciones destacadas por color.",
+          "Expanda los grupos para investigar productos con desviación sistemática."
+        ]
+      }
+    ]
+  }
+}

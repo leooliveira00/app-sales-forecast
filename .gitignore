@@ -1,0 +1,18 @@
+node_modules/
+build/
+dist/
+backup/
+coverage/
+pendente/
+.DS_Store
+*.log
+.env*
+!.env.example
+dev.db
+*.md
+!/README.md
+# Dados reais de importação (não versionar)
+*.csv
+*.dump
+*.mp4
+*.pdf

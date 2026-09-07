@@ -1,0 +1,96 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: ${ENV_PREFIX:-prod}-sales-forecast-web-postgres
+    restart: unless-stopped
+    # Tunning de performance — ajuste shared_buffers para ~25% da RAM disponível
+    command: >
+      postgres
+      -c shared_buffers=512MB
+      -c effective_cache_size=2GB
+      -c work_mem=32MB
+      -c maintenance_work_mem=256MB
+      -c max_connections=50
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+      -c max_worker_processes=8
+      -c max_parallel_workers_per_gather=4
+      -c max_parallel_workers=8
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-forecastdb}
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-forecastdb}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./backend
+    container_name: ${ENV_PREFIX:-prod}-sales-forecast-web-backend
+    restart: unless-stopped
+    environment:
+      # connection_limit=10 evita saturar o postgres (max_connections=50)
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-forecastdb}?connection_limit=10&pool_timeout=20
+      JWT_SECRET: ${JWT_SECRET}
+      PORT: 3000
+      NODE_ENV: production
+      # Aumenta heap do Node.js para 2GB — evita GC frequente em payloads grandes
+      NODE_OPTIONS: "--max-old-space-size=2048"
+      AIRFLOW_BASE_URL: ${AIRFLOW_BASE_URL:-}
+      AIRFLOW_USER: ${AIRFLOW_USER:-}
+      AIRFLOW_PASSWORD: ${AIRFLOW_PASSWORD:-}
+      INTERNAL_SYNC_TOKEN: ${INTERNAL_SYNC_TOKEN:-}
+      CORS_ORIGIN: ${CORS_ORIGIN:-}
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    container_name: ${ENV_PREFIX:-prod}-sales-forecast-web-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - app-network
+      - traefik-public
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-public"
+      - "traefik.http.routers.${ENV_PREFIX:-prod}-sales-forecast-web.rule=Host(`${APP_DOMAIN:-sales-forecast-web.example.com}`)"
+      # HTTPS em todos os ambientes (websecure + tls). A origem do cert vem do .env:
+      #   FRONTEND_CERTRESOLVER vazio   -> cert ESTÁTICO do file provider (ex.: dev, CA interna / Windows AD)
+      #   FRONTEND_CERTRESOLVER=tlsalpn -> emite/renova via TLS-ALPN-01 (prod, Let's Encrypt, só pela 443)
+      - "traefik.http.routers.${ENV_PREFIX:-prod}-sales-forecast-web.entrypoints=websecure"
+      - "traefik.http.routers.${ENV_PREFIX:-prod}-sales-forecast-web.tls=true"
+      - "traefik.http.routers.${ENV_PREFIX:-prod}-sales-forecast-web.tls.certresolver=${FRONTEND_CERTRESOLVER:-}"
+      - "traefik.http.services.${ENV_PREFIX:-prod}-sales-forecast-web.loadbalancer.server.port=80"
+
+volumes:
+  pgdata:
+  uploads:
+
+networks:
+  app-network:
+    driver: bridge
+  traefik-public:
+    external: true

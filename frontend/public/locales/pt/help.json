@@ -1,0 +1,83 @@
+{
+  "title": "Central de Ajuda",
+  "subtitle": "Manuais, termos e guias rápidos",
+  "close": "Fechar",
+  "searchPlaceholder": "Buscar na ajuda...",
+  "tabs": {
+    "guides": "Guias",
+    "glossary": "Glossário",
+    "videos": "Vídeos"
+  },
+  "noResults": "Nada encontrado para \"{{query}}\".",
+  "guidesEmpty": "Nenhum guia disponível para o seu perfil ainda.",
+  "videosEmpty": "Nenhum vídeo disponível no momento.",
+  "videosComingSoon": "Em breve...",
+  "videosComingSoonHint": "Os treinamentos para unidades de exportação estarão disponíveis em breve.",
+  "videoLoadError": "Não foi possível carregar o vídeo. Tente novamente.",
+  "redoTour": "Refazer o tour guiado",
+  "manual": "Manual completo (PDF)",
+  "manualUrl": "/uploads/manuais/manual-pt.pdf",
+  "videos": [
+    { "slug": "introducao",   "title": "Introdução" },
+    { "slug": "dashboard",    "title": "Tela Dashboard" },
+    { "slug": "meu-forecast", "title": "Tela Meu Forecast" },
+    { "slug": "consolidado",  "title": "Tela Consolidado" }
+  ],
+  "glossary": [
+    { "term": "ORC (Orçamento)", "def": "Orçamento anual de volume aprovado para cada produto e mês." },
+    { "term": "FCTS (Forecast)", "def": "A previsão de demanda que você informa para cada mês. É o número que será submetido para aprovação." },
+    { "term": "Venda A.A. (Ano Anterior)", "def": "Volume efetivamente vendido no mesmo mês do ano anterior. Serve como base de comparação para avaliar a sua previsão." },
+    { "term": "Desvio", "def": "Diferença percentual entre o FCTS e a referência (Venda A.A.). Indica o quanto a sua previsão se afasta do histórico — verde até 5%, amarelo até 15%, vermelho acima disso." },
+    { "term": "Ciclo de forecast", "def": "Janela mensal em que o forecast é aberto para preenchimento, revisão e submissão. Cada ciclo cobre um período de meses futuros." },
+    { "term": "Lead time", "def": "Antecedência, em meses, entre o ciclo atual e o período que está sendo previsto." },
+    { "term": "Visão consolidada (Todos os países)", "def": "Na tela Meu Forecast, em unidades de exportação, a opção \"Todos os países\" mostra a soma de todos os países. É somente leitura, para conferência — para editar, selecione um país específico." },
+    { "term": "Sugestão IA", "def": "Previsão gerada automaticamente por modelos estatísticos. Pode ser aceita como ponto de partida e ajustada depois." },
+    { "term": "Ações rápidas", "def": "Atalhos para preencher vários meses de uma vez: aceitar a sugestão IA, usar média histórica, valor fixo, distribuir um total ou ajustar por percentual." }
+  ],
+  "guides": {
+    "gestor": [
+      {
+        "id": "preencher-submeter",
+        "title": "Como preencher e submeter seu forecast",
+        "steps": [
+          "Selecione o ciclo desejado no seletor de ciclo, no topo da tela Meu Forecast.",
+          "Expanda uma família e, em seguida, um produto para visualizar os meses.",
+          "Informe o volume previsto (FCTS) em cada mês. O desvio em relação à venda do ano anterior aparece ao lado para orientar você.",
+          "Se preferir, use as Ações rápidas para preencher vários meses de uma só vez.",
+          "Revise os totais por família e clique em \"Submeter Ciclo\" para enviar para aprovação."
+        ]
+      },
+      {
+        "id": "export-por-pais",
+        "title": "Unidades de exportação: previsão por país",
+        "steps": [
+          "Em unidades de exportação, use o seletor de país que fica ao lado do seletor de ciclo.",
+          "Ao abrir, a tela já vem posicionada em um país específico — preencha o forecast dele normalmente.",
+          "A opção \"Todos os países\" é uma visão consolidada somente leitura (soma de todos os países), útil para conferência.",
+          "Para editar a previsão, adicionar ou remover produtos, selecione sempre um país específico.",
+          "Repita o preenchimento para cada país e submeta o ciclo ao final."
+        ]
+      },
+      {
+        "id": "acoes-rapidas",
+        "title": "Usando as Ações rápidas",
+        "steps": [
+          "Abra o menu \"Ações rápidas\" no cabeçalho de uma família.",
+          "Escolha uma opção: aceitar a sugestão IA, preencher com média (3, 6 ou 12 meses), definir um valor fixo, distribuir um total ou ajustar por percentual.",
+          "Confira o preview das mudanças antes de confirmar a aplicação.",
+          "Após aplicar, você ainda pode ajustar meses individualmente, se necessário."
+        ]
+      },
+      {
+        "id": "acompanhar-consolidado",
+        "title": "Acompanhando o consolidado",
+        "steps": [
+          "Acesse a tela Consolidado para ver os totais agregados por unidade, família e país.",
+          "Use o seletor de janela para mudar o período analisado.",
+          "Compare FCTS, ORC e Vendas lado a lado e observe os desvios destacados por cor.",
+          "Expanda os grupos para investigar produtos com desvio sistemático."
+        ]
+      }
+    ]
+  }
+}

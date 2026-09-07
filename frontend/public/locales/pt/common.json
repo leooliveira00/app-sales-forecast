@@ -1,0 +1,63 @@
+{
+  "months": [
+    "Jan",
+    "Fev",
+    "Mar",
+    "Abr",
+    "Mai",
+    "Jun",
+    "Jul",
+    "Ago",
+    "Set",
+    "Out",
+    "Nov",
+    "Dez"
+  ],
+  "monthsFull": [
+    "Janeiro",
+    "Fevereiro",
+    "Março",
+    "Abril",
+    "Maio",
+    "Junho",
+    "Julho",
+    "Agosto",
+    "Setembro",
+    "Outubro",
+    "Novembro",
+    "Dezembro"
+  ],
+  "status": {
+    "DRAFT": "Rascunho",
+    "SUBMITTED": "Pendente",
+    "APPROVED": "Aprovado",
+    "REJECTED": "Rejeitado"
+  },
+  "roles": {
+    "gestor": "Gerente",
+    "controladoria": "Controladoria",
+    "operador_pcp": "Operador PCP",
+    "admin_ti": "Administrador TI",
+    "consulta": "Consulta"
+  },
+  "actions": {
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "confirm": "Confirmar",
+    "loading": "Carregando...",
+    "reload": "Recarregar dados",
+    "close": "Fechar",
+    "apply": "Aplicar",
+    "ok": "OK",
+    "previous": "Anterior",
+    "next": "Próxima"
+  },
+  "windowSelector": {
+    "back": "Recuar 1 mês",
+    "forward": "Avançar 1 mês"
+  },
+  "errors": {
+    "loadError": "Erro ao carregar dados",
+    "noData": "Sem dados disponíveis"
+  }
+}

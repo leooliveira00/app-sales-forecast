@@ -1,0 +1,15 @@
+{
+  "title": "Sales Forecast Web",
+  "subtitle": "Sales Forecast System",
+  "emailLabel": "Corporate e-mail",
+  "emailPlaceholder": "name@company.com",
+  "passwordLabel": "Password",
+  "passwordPlaceholder": "••••••••",
+  "submitButton": "Sign in",
+  "submitting": "Signing in…",
+  "copyright": "© {{year}} Sales Forecast Web. All rights reserved.",
+  "errors": {
+    "required": "Please enter your e-mail and password to continue.",
+    "invalid": "Unable to sign in. Please check your credentials."
+  }
+}

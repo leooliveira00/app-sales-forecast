@@ -1,0 +1,92 @@
+{
+  "buttons": {
+    "back": "Volver",
+    "close": "Cerrar",
+    "last": "Finalizar",
+    "next": "Siguiente",
+    "nextWithProgress": "Siguiente ({current} de {total})",
+    "skip": "Omitir tour",
+    "open": "Abrir tour",
+    "start": "Tour guiado"
+  },
+  "gestor": {
+    "welcome": {
+      "title": "¡Bienvenido a Sales Forecast Web! 👋",
+      "content": "Esta guía rápida le mostrará las principales funcionalidades del sistema. Tarda menos de 2 minutos."
+    },
+    "cycle": {
+      "title": "Ciclo Actual",
+      "content": "Use las flechas para navegar entre los ciclos mensuales. El ciclo activo es donde usted completa los volúmenes de ventas."
+    },
+    "kpiBar": {
+      "title": "Indicadores de la Unidad",
+      "content": "Siga el progreso: volúmenes FCST confirmados, meta ORC, familias de producto y porcentaje de SKUs completados."
+    },
+    "products": {
+      "title": "Portafolio de Productos",
+      "content": "Los productos se agrupan por familia. Haga clic en una familia para expandirla y editar los volúmenes mensuales individualmente."
+    },
+    "submit": {
+      "title": "Enviar Forecast",
+      "content": "Cuando todos los volúmenes estén completados, envíe para aprobación del área de PCP. El sistema mostrará un resumen antes de confirmar."
+    },
+    "consolidadoWindow": {
+      "title": "Ventana de Análisis",
+      "content": "Use los presets (3M, 6M, 12M) o las flechas para definir el período de análisis histórico."
+    },
+    "consolidadoKpis": {
+      "title": "Indicadores de Rendimiento",
+      "content": "Sesgo del forecast, cumplimiento FCST/ORC, ventas realizadas y precisión del período — todo en un solo panel."
+    },
+    "consolidadoTabs": {
+      "title": "Análisis por División",
+      "content": "La pestaña División muestra el desglose por familia de producto. La pestaña Crónicos lista productos con desviaciones recurrentes."
+    },
+    "help": {
+      "title": "Centro de Ayuda 💡",
+      "content": "¡Listo! Siempre que tenga dudas, haga clic en el ícono de ayuda (?) en la parte superior de la pantalla. Allí encontrará guías paso a paso, el glosario, videos de capacitación y el manual completo."
+    }
+  },
+  "pcp": {
+    "welcome": {
+      "title": "¡Bienvenido a Sales Forecast Web! 👋",
+      "content": "Esta guía rápida le mostrará las principales funcionalidades de monitoreo del sistema. Tarda menos de 2 minutos."
+    },
+    "dashboardKpis": {
+      "title": "Panel de Control",
+      "content": "Monitoree el progreso del ciclo: cuántas unidades ya enviaron, aprobaciones pendientes y precisión global."
+    },
+    "aprovacoesList": {
+      "title": "Aprobaciones Pendientes",
+      "content": "Aquí están todas las entregas de forecast en espera de aprobación. Revise los volúmenes antes de aprobar o rechazar."
+    },
+    "aprovacoesFilter": {
+      "title": "Filtros de Aprobación",
+      "content": "Filtre por mes de referencia, unidad de ventas o estado para localizar rápidamente lo que necesita atención."
+    },
+    "consolidadoWindow": {
+      "title": "Ventana de Análisis",
+      "content": "Defina el período usando los presets (3M, 6M, 12M) o seleccione meses manualmente con las flechas."
+    },
+    "consolidadoKpis": {
+      "title": "Indicadores Consolidados",
+      "content": "Siga el Sesgo, FCST vs ORC, Ventas y Precisión del forecast para todas las unidades en el período seleccionado."
+    },
+    "consolidadoChart": {
+      "title": "Evolución del Ciclo",
+      "content": "El gráfico muestra la evolución mensual de ORC, FCST y Ventas para seguir tendencias a lo largo del tiempo."
+    },
+    "consolidadoTabs": {
+      "title": "Desglose por División",
+      "content": "En la pestaña Divisiones, expanda cada unidad de ventas para ver el detalle por familia de producto y país."
+    },
+    "help": {
+      "title": "Centro de Ayuda 💡",
+      "content": "Cuando lo necesite, haga clic en el ícono de ayuda (?) en la parte superior para abrir el Centro de Ayuda — con guías, glosario, videos y el manual completo."
+    },
+    "done": {
+      "title": "¡Tour completado! 🎉",
+      "content": "Ha conocido las principales pantallas del sistema. Use el botón \"Tour guiado\" en el menú lateral en cualquier momento para revisitar esta guía."
+    }
+  }
+}

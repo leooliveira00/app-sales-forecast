@@ -1,0 +1,83 @@
+{
+  "title": "Help Center",
+  "subtitle": "Manuals, terms and quick guides",
+  "close": "Close",
+  "searchPlaceholder": "Search help...",
+  "tabs": {
+    "guides": "Guides",
+    "glossary": "Glossary",
+    "videos": "Videos"
+  },
+  "noResults": "Nothing found for \"{{query}}\".",
+  "guidesEmpty": "No guides available for your profile yet.",
+  "videosEmpty": "No videos available at the moment.",
+  "videosComingSoon": "Coming soon...",
+  "videosComingSoonHint": "Training videos for export units will be available soon.",
+  "videoLoadError": "Could not load the video. Please try again.",
+  "redoTour": "Replay the guided tour",
+  "manual": "Full manual (PDF)",
+  "manualUrl": "/uploads/manuais/manual-en.pdf",
+  "videos": [
+    { "slug": "introducao",   "title": "Introduction" },
+    { "slug": "dashboard",    "title": "Dashboard screen" },
+    { "slug": "meu-forecast", "title": "My Forecast screen" },
+    { "slug": "consolidado",  "title": "Consolidated screen" }
+  ],
+  "glossary": [
+    { "term": "BDG (Budget / ORC)", "def": "Annual approved volume budget for each product and month." },
+    { "term": "FCST (Forecast)", "def": "The demand forecast you enter for each month. It is the number that will be submitted for approval." },
+    { "term": "Prior-Year Sales", "def": "Volume actually sold in the same month of the previous year. Used as a baseline to evaluate your forecast." },
+    { "term": "Deviation", "def": "Percentage difference between the forecast and the reference (prior-year sales). It shows how far your forecast is from history — green up to 5%, amber up to 15%, red above that." },
+    { "term": "Forecast cycle", "def": "Monthly window in which the forecast is opened for entry, review and submission. Each cycle covers a range of future months." },
+    { "term": "Lead time", "def": "Number of months between the current cycle and the period being forecast." },
+    { "term": "Consolidated view (All countries)", "def": "On the My Forecast screen, in export units, the \"All countries\" option shows the sum across all countries. It is read-only, for review — to edit, select a specific country." },
+    { "term": "AI suggestion", "def": "A forecast generated automatically by statistical models. It can be accepted as a starting point and adjusted afterwards." },
+    { "term": "Quick actions", "def": "Shortcuts to fill several months at once: accept the AI suggestion, use a historical average, a fixed value, distribute a total or adjust by percentage." }
+  ],
+  "guides": {
+    "gestor": [
+      {
+        "id": "preencher-submeter",
+        "title": "How to fill in and submit your forecast",
+        "steps": [
+          "Select the desired cycle in the cycle selector at the top of the My Forecast screen.",
+          "Expand a family and then a product to view the months.",
+          "Enter the forecast volume (FCST) for each month. The deviation from prior-year sales is shown alongside to guide you.",
+          "If you prefer, use the Quick actions to fill several months at once.",
+          "Review the family totals and click \"Submit Cycle\" to send for approval."
+        ]
+      },
+      {
+        "id": "export-por-pais",
+        "title": "Export units: forecasting by country",
+        "steps": [
+          "In export units, use the country selector next to the cycle selector.",
+          "On open, the screen already starts on a specific country — fill in its forecast normally.",
+          "The \"All countries\" option is a read-only consolidated view (sum of all countries), useful for review.",
+          "To edit the forecast or add/remove products, always select a specific country.",
+          "Repeat the entry for each country and submit the cycle at the end."
+        ]
+      },
+      {
+        "id": "acoes-rapidas",
+        "title": "Using Quick actions",
+        "steps": [
+          "Open the \"Quick actions\" menu in a family header.",
+          "Choose an option: accept the AI suggestion, fill with an average (3, 6 or 12 months), set a fixed value, distribute a total or adjust by percentage.",
+          "Check the preview of the changes before confirming.",
+          "After applying, you can still adjust individual months if needed."
+        ]
+      },
+      {
+        "id": "acompanhar-consolidado",
+        "title": "Tracking the consolidated view",
+        "steps": [
+          "Open the Consolidated screen to see totals aggregated by unit, family and country.",
+          "Use the window selector to change the analyzed period.",
+          "Compare FCST, BDG and Sales side by side and watch the color-highlighted deviations.",
+          "Expand the groups to investigate products with systematic deviation."
+        ]
+      }
+    ]
+  }
+}

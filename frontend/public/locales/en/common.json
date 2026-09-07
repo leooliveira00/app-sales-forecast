@@ -1,0 +1,63 @@
+{
+  "months": [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
+  ],
+  "monthsFull": [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ],
+  "status": {
+    "DRAFT": "Draft",
+    "SUBMITTED": "Pending",
+    "APPROVED": "Approved",
+    "REJECTED": "Rejected"
+  },
+  "roles": {
+    "gestor": "Manager",
+    "controladoria": "Controlling",
+    "operador_pcp": "PCP Operator",
+    "admin_ti": "IT Administrator",
+    "consulta": "Read-only"
+  },
+  "actions": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "confirm": "Confirm",
+    "loading": "Loading...",
+    "reload": "Reload data",
+    "close": "Close",
+    "apply": "Apply",
+    "ok": "OK",
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "windowSelector": {
+    "back": "Go back 1 month",
+    "forward": "Go forward 1 month"
+  },
+  "errors": {
+    "loadError": "Error loading data",
+    "noData": "No data available"
+  }
+}

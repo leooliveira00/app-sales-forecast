@@ -1,0 +1,776 @@
+// Prisma Schema — Sales Forecast Web
+// Refatoração: Natural Keys — Produto, UnidadeVenda, Pais e OrcamentoRun usam chaves de negócio como PK
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ──────────────────────────────────────────
+// ENUMS
+// ──────────────────────────────────────────
+
+enum Perfil {
+  gestor
+  controladoria
+  operador_pcp
+  admin_ti
+  /// Somente leitura: dashboard, consolidado e aprovações sem nenhuma ação.
+  consulta
+}
+
+enum UserUnidadeRole {
+  GESTOR
+  GERENTE
+}
+
+enum RunStatus {
+  PROCESSING
+  SUCCESS
+  FAILED
+}
+
+enum SubmissionStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+enum OrcamentoStatus {
+  APROVADO
+  ARQUIVADO
+}
+
+enum UnidadeTipo {
+  NACIONAL
+  EXPORT
+}
+
+enum ProtheusSyncStatus {
+  RUNNING
+  SUCCESS
+  PARTIAL
+  FAILED
+}
+
+enum ProtheusExportStatus {
+  RUNNING
+  SUCCESS
+  PARTIAL   // alguma unidade ou mês falhou, mas ao menos uma teve sucesso
+  FAILED    // nenhuma unidade enviada com sucesso
+}
+
+enum ProtheusExportItemStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+// ──────────────────────────────────────────
+// USUÁRIOS / UNIDADES
+// ──────────────────────────────────────────
+
+model User {
+  id       String @id @default(uuid())
+
+  email     String  @unique
+  password  String
+  nome      String
+  perfil    Perfil
+  avatarUrl String?
+
+  lastLoginAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  unidades              UserUnidadeVenda[]
+  overrides             ForecastOverride[]
+  overrideHistory       ForecastOverrideHistory[]
+  submissions           DivisionSubmission[]  @relation("SubmissionAutor")
+  reviews               DivisionSubmission[]  @relation("SubmissionRevisor")
+  forecastItemExcluidos ForecastItem[]        @relation("ForecastItemExcluido")
+  cyclesBlocked         CycleReadinessLog[]   @relation("CycleBlockedBy")
+  cyclesUnblocked       CycleReadinessLog[]   @relation("CycleUnblockedBy")
+  notifications         Notification[]
+  protheusExports       ProtheusExportLog[]
+  auditLogs             AuditLog[]
+
+  @@index([perfil])
+}
+
+model UnidadeVenda {
+  // Chave de negócio estável vinda do ERP (ex.: "3201002")
+  codigo    String      @id
+
+  descricao String
+  ativo     Boolean     @default(true)
+  tipo      UnidadeTipo @default(NACIONAL)
+  config    Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  usuarios       UserUnidadeVenda[]
+  produtos       ProdutoUnidadeVenda[]
+  submissions    DivisionSubmission[]
+  forecastItems  ForecastItem[]
+  vendas         VendaMensal[]
+  orcamentoItems OrcamentoItem[]
+  paises         Pais[]
+
+  @@index([ativo])
+  @@index([tipo])
+}
+
+// Países vinculados a unidades de exportação (APAC / EMEA / LATAM)
+model Pais {
+  // Código ISO 3166-1 alpha-3 (ex.: "JPN", "DEU", "BRA")
+  iso3  String  @id
+
+  nome  String
+  ativo Boolean @default(true)
+
+  // FK para a unidade de exportação proprietária (ex.: APAC)
+  unidadeVendaId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  unidadeVenda  UnidadeVenda   @relation(fields: [unidadeVendaId], references: [codigo], onDelete: Cascade)
+  forecastItems ForecastItem[]
+  vendas        VendaMensal[]
+  orcamentoItems OrcamentoItem[]
+
+  @@index([unidadeVendaId, ativo])
+}
+
+model UserUnidadeVenda {
+  id             String @id @default(uuid())
+
+  userId         String
+  unidadeVendaId String
+  role           UserUnidadeRole
+  ativo          Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user         User         @relation(fields: [userId],         references: [id], onDelete: Cascade)
+  unidadeVenda UnidadeVenda @relation(fields: [unidadeVendaId], references: [codigo], onDelete: Cascade)
+
+  @@unique([userId, unidadeVendaId, role])
+  @@index([unidadeVendaId, role])
+  @@index([userId, role])
+}
+
+// ──────────────────────────────────────────
+// PRODUTOS
+// ──────────────────────────────────────────
+
+model Produto {
+  // Chave de negócio estável vinda do ERP (ex.: "CAR10001")
+  codigo    String @id
+
+  descricao String
+  ativo     Boolean @default(true)
+
+  tipo         String?   // tipo do produto no ERP (ex: "PA", "PI", "MP")
+  classe       String?   // classificação ABC do SKU (ex: F, E, D, C, B, A)
+  ncm          String?
+  erpUpdatedAt DateTime?
+  syncedAt     DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  unidades       ProdutoUnidadeVenda[]
+  forecastItems  ForecastItem[]
+  vendas         VendaMensal[]
+  orcamentoItems OrcamentoItem[]
+
+  @@index([ativo])
+}
+
+model ProdutoUnidadeVenda {
+  id             String @id @default(uuid())
+
+  produtoId      String
+  unidadeVendaId String
+
+  ativo         Boolean @default(true)
+  codigoFamilia String?  // código da família AGM (codigoFamiliaAGM do Protheus)
+  familia       String?  // descrição da família AGM (descricaoFamiliaAGM do Protheus)
+  // Nome descritivo da divisão (ex: "Cardio") — desnormalizado para facilitar cargas via CSV/Airflow
+  divisao       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  produto  Produto      @relation(fields: [produtoId],      references: [codigo], onDelete: Cascade)
+  unidade  UnidadeVenda @relation(fields: [unidadeVendaId], references: [codigo], onDelete: Cascade)
+
+  @@unique([produtoId, unidadeVendaId])
+  @@index([unidadeVendaId, ativo])
+  @@index([produtoId, ativo])
+}
+
+// ──────────────────────────────────────────
+// FORECAST (Airflow publica → gestor revisa)
+// ──────────────────────────────────────────
+
+// Cada execução do Airflow gera um ForecastRun com N ForecastItems
+model ForecastRun {
+  id String @id @default(uuid())
+
+  refMonth     DateTime    // ciclo: ex.: 2026-03-01 (mês de referência do ciclo)
+  executedAt   DateTime @default(now())
+  status       RunStatus
+
+  // Janela editável: definida pelo Airflow com base no lead time
+  windowStart    DateTime?  // primeiro mês revisável (ex.: 2026-05-01)
+  windowEnd      DateTime?  // último mês revisável (ex.: 2027-04-01)
+  leadTimeMonths Int        @default(2)  // gap em meses até o 1º mês editável
+
+  // Controle de visibilidade: null = usa regra global (SystemConfig.cycleOpenDay)
+  availableFrom  DateTime?  // override por run: Airflow pode antecipar/adiar a abertura
+  availableUntil DateTime?  // fechamento automático: null = sem expiração (legado)
+
+  sourceKey    String?   // hash/mtime dos arquivos de origem
+  artifactPath String?   // caminho do Excel/PDF gerado
+
+  createdAt DateTime @default(now())
+
+  items ForecastItem[]
+
+  @@index([refMonth])
+}
+
+// Uma linha por produto + unidade + mês dentro de um run
+// Para unidades EXPORT: uma linha por produto + unidade + mês + país (paisIso3 preenchido)
+// Para unidades NACIONAL: paisIso3 = null (uma linha por produto + unidade + mês)
+model ForecastItem {
+  id String @id @default(uuid())
+
+  runId          String
+  produtoId      String
+  unidadeVendaId String
+  month          DateTime  // mês alvo: ex.: 2026-05-01 (dentro da janela do ciclo)
+
+  // Para unidades EXPORT: país deste item (null = unidade NACIONAL)
+  paisIso3 String?
+
+  volumeIA Int?
+  estoque  Int?
+
+  // Gestão de portfólio por ciclo
+  source         String   @default("AIRFLOW")  // "AIRFLOW" | "MANUAL"
+  gestorExcluido Boolean  @default(false)
+  excluidoAt     DateTime?
+  excluidoPorId  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  run          ForecastRun  @relation(fields: [runId],          references: [id], onDelete: Cascade)
+  produto      Produto      @relation(fields: [produtoId],      references: [codigo])
+  unidadeVenda UnidadeVenda @relation(fields: [unidadeVendaId], references: [codigo])
+  pais         Pais?        @relation(fields: [paisIso3],       references: [iso3])
+  excluidoPor  User?        @relation("ForecastItemExcluido", fields: [excluidoPorId], references: [id])
+
+  overrides ForecastOverride[]
+  history   ForecastOverrideHistory[]
+
+  @@unique([runId, produtoId, unidadeVendaId, month, paisIso3])
+  @@index([unidadeVendaId, month])
+  @@index([produtoId, month])
+  @@index([runId, unidadeVendaId])
+  @@index([paisIso3, month])
+  @@index([gestorExcluido])
+  @@index([month, paisIso3])
+  @@index([month, runId])
+}
+
+// Revisão manual do gestor (FCTS = volume forecast confirmado)
+model ForecastOverride {
+  id String @id @default(uuid())
+
+  forecastItemId String
+  gestorId       String?
+
+  volumeFCTS Int
+  note       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  forecastItem ForecastItem @relation(fields: [forecastItemId], references: [id], onDelete: Cascade)
+  gestor       User?        @relation(fields: [gestorId],       references: [id], onDelete: SetNull)
+
+  @@unique([forecastItemId])
+  @@index([gestorId])
+}
+
+// Histórico de revisões do FCTS — snapshot criado a cada upsertOverride ou deleteOverride
+model ForecastOverrideHistory {
+  id String @id @default(uuid())
+
+  forecastItemId String
+  gestorId       String?
+
+  volumeFCTS Int
+  note       String?
+  action     String   @default("UPDATE") // "UPDATE" | "DELETE"
+  revisedAt  DateTime @default(now())
+
+  forecastItem ForecastItem @relation(fields: [forecastItemId], references: [id], onDelete: Cascade)
+  gestor       User?        @relation(fields: [gestorId],       references: [id], onDelete: SetNull)
+
+  @@index([forecastItemId])
+  @@index([gestorId])
+}
+
+// ──────────────────────────────────────────
+// WORKFLOW: SUBMISSÃO POR UNIDADE/MÊS
+// ──────────────────────────────────────────
+
+model DivisionSubmission {
+  id String @id @default(uuid())
+
+  refMonth       DateTime
+  unidadeVendaId String
+  status         SubmissionStatus @default(DRAFT)
+
+  autorId   String
+  revisorId String?
+
+  submittedAt     DateTime?
+  reviewedAt      DateTime?
+  rejectionReason String?
+  needsReview     Boolean   @default(false) // aprovada antes de correção de ciclo — PCP deve reconfirmar
+  autoSubmitted   Boolean   @default(false) // true quando submetido automaticamente pelo sistema ao fim do prazo
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  unidadeVenda UnidadeVenda @relation(fields: [unidadeVendaId], references: [codigo])
+  autor        User         @relation("SubmissionAutor",   fields: [autorId],   references: [id])
+  revisor      User?        @relation("SubmissionRevisor", fields: [revisorId], references: [id])
+
+  @@unique([refMonth, unidadeVendaId])
+  @@index([status, refMonth])
+  @@index([unidadeVendaId, refMonth])
+}
+
+// ──────────────────────────────────────────
+// HISTÓRICO DE VENDAS MENSAIS
+// ──────────────────────────────────────────
+
+model VendaMensal {
+  id String @id @default(uuid())
+
+  produtoId      String
+  unidadeVendaId String
+  month          DateTime  // mês normalizado: 1º dia do mês
+
+  quantidade Int
+  receita    Decimal? @db.Decimal(18, 2)
+  canal      String   @default("VENDA DIRETA")  // ex.: "VENDA DIRETA" | "DISTRIBUIDOR"
+
+  // Para unidades de exportação: vendas por país (null = total da unidade nacional)
+  paisIso3 String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  produto      Produto      @relation(fields: [produtoId],      references: [codigo], onDelete: Cascade)
+  unidadeVenda UnidadeVenda @relation(fields: [unidadeVendaId], references: [codigo], onDelete: Cascade)
+  pais         Pais?        @relation(fields: [paisIso3],       references: [iso3])
+
+  // Dois índices parciais no lugar do @@unique simples:
+  // - nacionais (paisIso3 IS NULL): unicidade em (produto, unidade, mês, canal)
+  // - exportações (paisIso3 IS NOT NULL): unicidade em (produto, unidade, mês, canal, país)
+  // Ver migração 20260401000003_venda_mensal_pais_unique
+  @@index([produtoId, unidadeVendaId, month, canal])
+  @@index([unidadeVendaId, month])
+  @@index([produtoId, month])
+  @@index([paisIso3, month])
+  @@index([month])
+}
+
+// ──────────────────────────────────────────
+// CONFIGURAÇÕES GLOBAIS DO SISTEMA
+// ──────────────────────────────────────────
+
+// Key-value store para configurações globais ajustáveis pelo admin
+// Exemplos: cycleOpenDay=5, cycleOpenHour=0
+model SystemConfig {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+// ──────────────────────────────────────────
+// CONTROLE DE CICLOS MENSAIS
+// ──────────────────────────────────────────
+
+// DAGs do Airflow que devem concluir com success antes do ciclo abrir
+model CycleRequiredDag {
+  id      String  @id @default(uuid())
+  dagId   String  @unique  // ID exato da DAG no Airflow
+  label   String           // Nome legível para exibição
+  enabled Boolean @default(true)
+  order   Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Prontidão e histórico de bloqueios de cada ciclo mensal
+model CycleReadinessLog {
+  id       String   @id @default(uuid())
+  refMonth DateTime // mês do ciclo: ex 2026-03-01
+
+  // Timestamps de conclusão por DAG (JSON: { "dag_id": "ISO timestamp" })
+  stepsCompleted    Json @default("{}")
+  // dag_run_ids esperados para deduplicação e proteção contra reruns concorrentes
+  expectedDagRunIds Json @default("{}")
+
+  gate CycleGate @default(PENDING)
+
+  // Auditoria de bloqueios manuais
+  blockedAt     DateTime?
+  blockedById   String?
+  blockedReason String?
+  unblockedAt   DateTime?
+  unblockedById String?
+  rerunReason   String?
+
+  retryCount  Int     @default(0)
+  triggeredBy String? // "airflow-scheduler" | "manual:<email>"
+
+  // Controle de notificação de abertura — preenchido pelo watchdog ao disparar CYCLE_OPENED
+  gestorNotifiedAt DateTime?
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  blockedBy   User? @relation("CycleBlockedBy",   fields: [blockedById],   references: [id])
+  unblockedBy User? @relation("CycleUnblockedBy", fields: [unblockedById], references: [id])
+
+  @@unique([refMonth])
+  @@index([gate])
+}
+
+enum CycleGate {
+  PENDING
+  PARTIAL
+  READY
+  AWAITING_PREV_CLOSE  // todas DAGs ok, mas ciclo anterior ainda tem submissões abertas
+  REPROCESSING         // rerun em andamento, ciclo temporariamente fechado para gestores
+  BLOCKED
+  FAILED
+  CLOSED               // ciclo encerrado definitivamente
+}
+
+// ──────────────────────────────────────────
+// NOTIFICAÇÕES IN-APP
+// ──────────────────────────────────────────
+
+model Notification {
+  id       String    @id @default(uuid())
+  userId   String
+  type     String    // "CYCLE_OPENED" | "CYCLE_BLOCKED" | "CYCLE_FAILED" | "CYCLE_STUCK"
+  title    String
+  body     String
+  refMonth DateTime?
+  readAt   DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+}
+
+// ──────────────────────────────────────────
+// SYNC PROTHEUS → APLICAÇÃO
+// ──────────────────────────────────────────
+
+// Registro de cada execução de sync recebida do Airflow
+model ProtheusSyncLog {
+  id           String             @id @default(uuid())
+
+  // Origem: "airflow-scheduler" | "airflow-manual:<email>"
+  triggeredBy  String
+
+  status       ProtheusSyncStatus
+  cTipo        String             @default("PA")
+
+  // Contadores de resultado
+  totalRecebidos   Int  @default(0)
+  produtosCreated  Int  @default(0)
+  produtosUpdated  Int  @default(0)
+
+  errorMessage String?
+  durationMs   Int?
+
+  startedAt  DateTime  @default(now())
+  finishedAt DateTime?
+
+  @@index([status])
+  @@index([startedAt])
+}
+
+model VendasSyncLog {
+  id          String             @id @default(uuid())
+  triggeredBy String
+  status      ProtheusSyncStatus
+  refMonth    DateTime
+  cDataDe     String
+  cDataAte    String
+
+  totalRecebidos        Int @default(0)
+  totalAgrupados        Int @default(0)
+  totalUpsertedVendas   Int @default(0)
+  totalUpsertedVinculos Int @default(0)
+  totalSkipped          Int @default(0)
+
+  errorMessage String?
+  durationMs   Int?
+
+  startedAt  DateTime  @default(now())
+  finishedAt DateTime?
+
+  @@index([status])
+  @@index([refMonth])
+  @@index([startedAt])
+}
+
+// ──────────────────────────────────────────
+// EXPORT FORECAST → PROTHEUS
+// ──────────────────────────────────────────
+
+// Registro de cada execução de envio do forecast ao Protheus
+model ProtheusExportLog {
+  id              String               @id @default(uuid())
+  refMonth        DateTime
+  triggeredById   String
+  triggeredBy     User                 @relation(fields: [triggeredById], references: [id])
+  parentLogId     String?              // referência ao log anterior quando for retry de falhas
+  status          ProtheusExportStatus @default(RUNNING)
+  totalUnidades   Int                  @default(0)
+  unidadesOk      Int                  @default(0)
+  unidadesFailed  Int                  @default(0)
+  startedAt       DateTime             @default(now())
+  finishedAt      DateTime?
+  durationMs      Int?
+  errorMessage    String?
+  airflowRunId    String?              // dag_run_id retornado pelo Airflow ao disparar a DAG
+  // Rastreamento granular por unidade×mês (Array<UnitExportDetail>)
+  details         Json?
+  csvFallbackPath String?
+
+  items ProtheusExportItem[]
+
+  @@index([refMonth])
+  @@index([status])
+  @@index([startedAt])
+}
+
+// Snapshot auditável de cada item (produto×unidade×mês) enviado ao Protheus
+model ProtheusExportItem {
+  id             String                   @id @default(uuid())
+  logId          String
+  log            ProtheusExportLog        @relation(fields: [logId], references: [id], onDelete: Cascade)
+
+  // Chave do item enviado
+  unidadeVendaId String
+  month          DateTime                 // 1º dia do mês enviado
+  produtoId      String
+  codigoFamilia  String?
+
+  // Valor efetivamente enviado ao Protheus
+  volumeFCTS     Int
+
+  // Rastreabilidade — origem do valor
+  forecastItemId String?
+  overrideId     String?
+
+  status  ProtheusExportItemStatus @default(PENDING)
+  error   String?
+  sentAt  DateTime?
+
+  @@index([logId])
+  @@index([unidadeVendaId, month])
+  @@index([produtoId])
+  @@index([forecastItemId])
+}
+
+// ──────────────────────────────────────────
+// ORÇAMENTO ANUAL
+// ──────────────────────────────────────────
+
+// Uma carga de orçamento por ano (pode ser substituída por nova versão arquivando a anterior)
+model OrcamentoRun {
+  // Ano do orçamento como chave primária (ex.: 2026)
+  ano        Int             @id
+
+  aprovadoEm DateTime?
+  status     OrcamentoStatus @default(APROVADO)
+  sourceKey  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items OrcamentoItem[]
+
+  @@index([status])
+}
+
+// Um item por produto + unidade + mês dentro de um run anual
+model OrcamentoItem {
+  id String @id @default(uuid())
+
+  orcamentoAno   Int
+  produtoId      String
+  unidadeVendaId String
+  month          DateTime  // mês normalizado: 1º dia do mês
+
+  volumeORC      Int
+
+  // Para unidades de exportação: ORC por país (null = total da unidade)
+  paisIso3 String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orcamentoRun OrcamentoRun @relation(fields: [orcamentoAno],   references: [ano],    onDelete: Cascade)
+  produto      Produto      @relation(fields: [produtoId],      references: [codigo])
+  unidadeVenda UnidadeVenda @relation(fields: [unidadeVendaId], references: [codigo])
+  pais         Pais?        @relation(fields: [paisIso3],       references: [iso3])
+
+  // Dois índices parciais no lugar de um único @@unique:
+  // - nacionais (paisIso3 IS NULL):     unicidade em (ano, produto, unidade, mês)
+  // - exportações (paisIso3 IS NOT NULL): unicidade em (ano, produto, unidade, mês, país)
+  // Ver migração 20260331000001_orcamento_item_pais_unique
+  @@index([orcamentoAno, produtoId, unidadeVendaId, month])
+  @@index([unidadeVendaId, month])
+  @@index([paisIso3, month])
+  @@index([produtoId, month])
+}
+
+// ──────────────────────────────────────────
+// AUDIT TRAIL
+// ──────────────────────────────────────────
+
+// Registro imutável de toda alteração relevante — quem, o quê, como e quando
+model AuditLog {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+
+  userId      String?
+  userNome    String?  // snapshot — preservado mesmo se usuário for deletado
+  userPerfil  String?  // snapshot
+  source      String   // "user" | "airflow" | "system"
+  action      String   // "CREATE" | "UPDATE" | "DELETE" | "STATE_CHANGE"
+  entity      String   // "ForecastOverride" | "ForecastItem" | "DivisionSubmission"
+  entityId    String
+
+  refMonth    String?  // "2026-04" — contexto de negócio para filtragem
+  unidadeId   String?  // código da UnidadeVenda para filtragem
+  produtoId   String?  // código do Produto para filtragem
+  paisIso3    String?  // null = unidade nacional; preenchido apenas para unidades EXPORT
+
+  before      Json?    // estado anterior (snapshot)
+  after       Json?    // estado novo (snapshot)
+  metadata    Json?    // operation, basis, correlationId, affectedCount, etc.
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([entity, entityId])
+  @@index([userId])
+  @@index([refMonth])
+  @@index([unidadeId])
+  @@index([produtoId])
+  @@index([paisIso3])
+  @@index([createdAt])
+}
+
+// ──────────────────────────────────────────
+// SNAPSHOT TABLES — Agregados pré-computados
+// ──────────────────────────────────────────
+
+/// Totais mensais de ORC/FCTS/Vendas por (ano, unidade, mês).
+/// Inclui campos para Δ Ciclo Anterior por mês, permitindo somar
+/// qualquer janela de período (ano, semestre, trimestre, mês a mês).
+model ConsolidadoMesSnapshot {
+  orcamentoAno    Int
+  unidadeVendaId  String
+  refMonth        DateTime // normalizado para 1º do mês UTC
+
+  orc             Int
+  fcts            Int
+  vendas          Int
+  submissaoStatus String?  // DivisionSubmission.status para esta unidade+mês
+
+  latestRunFcts   Int      // FCTS deste mês do run aprovado mais recente
+  prevRunFcts     Int      // FCTS deste mês do run aprovado anterior (Δ ciclo)
+
+  computedAt      DateTime @default(now())
+
+  @@id([orcamentoAno, unidadeVendaId, refMonth])
+  @@index([orcamentoAno, refMonth])
+  @@index([unidadeVendaId, refMonth])
+}
+
+/// Detalhe de produto×mês por (ano, unidade, produto, mês).
+/// Serve: detalhamento de unidade, lista de produtos, familiaMeses,
+/// produtos crônicos e gráficos de produto-meses.
+model ConsolidadoProdutoMesSnapshot {
+  orcamentoAno     Int
+  unidadeVendaId   String
+  produtoId        String
+  refMonth         DateTime
+
+  produtoCodigo    String
+  produtoDescricao String
+  familia          String?
+  classe           String?
+
+  orc              Int
+  fcts             Int
+  vendas           Int
+
+  computedAt       DateTime @default(now())
+
+  @@id([orcamentoAno, unidadeVendaId, produtoId, refMonth])
+  @@index([orcamentoAno, unidadeVendaId])
+  @@index([unidadeVendaId, refMonth])
+  @@index([produtoId, unidadeVendaId])
+}
+
+/// Métricas de acurácia por (unidade, anchorMonth, meses).
+/// anchorMonth é o último mês da janela de medição.
+/// meses indica o tamanho da janela (3, 6 ou 12 meses).
+/// Populado para todos os anchorMonths históricos disponíveis.
+model AcuraciaSnapshot {
+  unidadeVendaId String
+  anchorMonth    DateTime // último mês da janela (1º do mês UTC)
+  meses          Int      @default(3) // tamanho da janela em meses
+
+  acuracia       Decimal  @db.Decimal(6, 2)
+  bias           Decimal  @db.Decimal(8, 2)
+  ciclosValidos  Int
+  totalVendas    Decimal? @db.Decimal(18, 0)
+
+  computedAt     DateTime @default(now())
+
+  @@id([unidadeVendaId, anchorMonth, meses])
+  @@index([anchorMonth, meses])
+}

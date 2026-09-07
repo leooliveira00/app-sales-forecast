@@ -1,0 +1,15 @@
+{
+  "title": "Sales Forecast Web",
+  "subtitle": "Sistema de Previsión de Ventas",
+  "emailLabel": "Correo corporativo",
+  "emailPlaceholder": "nombre@empresa.com",
+  "passwordLabel": "Contraseña",
+  "passwordPlaceholder": "••••••••",
+  "submitButton": "Ingresar",
+  "submitting": "Ingresando…",
+  "copyright": "© {{year}} Sales Forecast Web. Todos los derechos reservados.",
+  "errors": {
+    "required": "Ingrese correo y contraseña para continuar.",
+    "invalid": "No fue posible iniciar sesión. Verifique sus credenciales."
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "title": "Dashboard",
+  "cards": {
+    "criticalDeviations": "Critical Deviations",
+    "filledProducts": "Filled Products",
+    "monthStatus": "Month Status",
+    "cycleProgress": "Cycle Progress",
+    "pendingApproval": "Pending Approval",
+    "globalAccuracy": "Global Accuracy 3M",
+    "unitAccuracy": "Unit Accuracy 3M",
+    "unitsWithoutSubmission": "Units Without Submission",
+    "fctsOrcDeviation": "FCST/BDG Deviation (cycle)",
+    "approvalRate": "Direct Approval Rate"
+  },
+  "labels": {
+    "skus": "SKUs",
+    "allWithinLimit": "All within limit",
+    "noData": "No data",
+    "waitingRealSales": "Waiting for actual sales",
+    "allSubmitted": "All submitted",
+    "allUnitsSubmitted": "All units submitted",
+    "noPendingUnits": "No pending units in the current cycle.",
+    "noDeviations": "No critical deviations at the moment",
+    "noDeviation": "Within limit",
+    "deviation": {
+      "ok": "Within limit",
+      "warning": "Warning",
+      "critical": "Critical"
+    },
+    "noDataCycle": "No data in cycle",
+    "pending": "Pending",
+    "submitted": "Submitted",
+    "noApprovalsYear": "No approvals or rejections this year",
+    "pendingSuffix_one": "{{count}} pending",
+    "pendingSuffix_other": "{{count}} pending",
+    "allUnitsSubmittedDetail": "All units submitted · click for details",
+    "currentCycle": "Current cycle analysis",
+    "portfolioPct": "{{value}}% of portfolio",
+    "waiting": "waiting",
+    "pendingSubmissions_zero": "no submissions waiting",
+    "pendingSubmissions_one": "{{count}} submission awaiting review",
+    "pendingSubmissions_other": "{{count}} submissions awaiting review",
+    "moreToReview": "+{{count}} more → View approvals",
+    "noRejections": "✓ no rejections",
+    "rework_one": "{{count}} rework",
+    "rework_other": "{{count}} reworks",
+    "approvalStats": "{{approved}} approved · {{rejected}} rejected in {{year}}",
+    "accuracyGood": "good",
+    "accuracyRegular": "fair",
+    "accuracyCritical": "critical",
+    "calculating": "calculating...",
+    "unitsAbove90": "{{above}} of {{total}} units ≥90%",
+    "seeMore": "see →",
+    "unitsOf": "of {{total}} units in cycle · click to see which",
+    "overestimate": "overestimate relative to BDG",
+    "underestimate": "underestimate relative to BDG",
+    "unitsWord_one": "unit",
+    "unitsWord_other": "units",
+    "currentSubmission": "current submission",
+    "desvioThreshold": ">{{value}}% deviation",
+    "familiesCount_one": "{{count}} family · →",
+    "familiesCount_other": "{{count}} families · →",
+    "pendingBadge": "{{count}} pending",
+    "pendingBadge_other": "{{count}} pending"
+  },
+  "rejection": {
+    "title": "Forecast Rejected",
+    "reasonLabel": "Rejection reason",
+    "reviewHint": "Review the volumes and resubmit the cycle to correct."
+  },
+  "tendencia": {
+    "title": "Accuracy by Unit",
+    "noData": "Trend data unavailable.",
+    "noDataDetail": "The unit does not yet have BDG or sales history.",
+    "waitingData": "Waiting for actual sales and FCST submissions.",
+    "deviationSubtitle": "Average FCST vs Sales deviation — last 3 valid cycles",
+    "chartTitle": "Last 12 Months Evolution — My Unit",
+    "subtitleMobile": "BDG × FCST × Sales · Deviation",
+    "subtitleDesktop": "BDG × FCST (Confirmed Forecast) × Actual Sales · FCST/Sales Deviation · Click any point for details",
+    "subtitleDesktopNoClick": "BDG × FCST (Confirmed Forecast) × Actual Sales · FCST/Sales Deviation",
+    "deviationPct": "Deviation %",
+    "tooltipDeviation": "FCST/Sales Deviation:",
+    "desvioLegend": "green ≤10% · yellow 10–20% · red >20%"
+  },
+  "drawer": {
+    "fctsVsSale": "FCST/Sales Deviation",
+    "achievementVsORC": "Achievement vs BDG",
+    "skusAboveThreshold": "{{count}} SKUs above {{threshold}}% FCST/Prior-Year deviation",
+    "allWithinLimit": "All SKUs are within the {{threshold}}% limit.",
+    "deviationDescription": "SKUs with FCST/Prior-Year deviation above {{threshold}}%, grouped by family.",
+    "maxDeviation": "max {{value}}%",
+    "viewConsolidado": "View details in Consolidated",
+    "pendingSubtitle": "{{count}} product not filled",
+    "pendingSubtitle_other": "{{count}} products not filled",
+    "pendingDescription": "Products with no FCTS in any month of the cycle window. Fill them in on the Forecast screen.",
+    "allFilled": "All filled",
+    "allFilledDetail": "Every product in the cycle has FCTS."
+  },
+  "legend": {
+    "orc": "BDG",
+    "fcts": "FCST",
+    "vendaAA": "Prior-Year",
+    "vendas": "Sales",
+    "subtitle": "BDG · FCST · Sales · Deviation"
+  },
+  "actions": {
+    "goToForecast": "Go to Forecast →",
+    "goToApprovals": "Go to Approvals"
+  },
+  "cronicos": {
+    "persistentDeviation_one": "{{count}} product with persistent deviation",
+    "persistentDeviation_other": "{{count}} products with persistent deviation",
+    "cycles": "3+ consecutive cycles",
+    "viewConsolidado": "View Consolidated →",
+    "achievement": "achiev. {{value}}%"
+  },
+  "tooltips": {
+    "globalAccuracy": "Weighted average accuracy by sales volume of all units in the last 3 months. Calculated only with volumes confirmed by the manager in approved cycles.",
+    "unitAccuracy": "Your unit's accuracy over the last 3 months. Calculated only with volumes confirmed by the manager in approved cycles."
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "myForecast": "Mi Forecast",
+    "consolidado": "Consolidado",
+    "aprovacoes": "Aprobaciones",
+    "ciclos": "Ciclos",
+    "usuarios": "Usuarios",
+    "unidades": "Unidades",
+    "produtos": "Productos",
+    "configuracoes": "Configuraciones",
+    "protheus": "Protheus",
+    "auditoria": "Auditoría",
+    "airflow": "Airflow",
+    "myAccount": "Mi Cuenta",
+    "admin": "Administración"
+  },
+  "sections": {
+    "analise": "Análisis",
+    "operacao": "Operación",
+    "sistema": "Sistema"
+  },
+  "sidebar": {
+    "expand": "Expandir menú",
+    "collapse": "Contraer menú",
+    "unit": "Unidad",
+    "activeUnit": "Unidad activa",
+    "logout": "Cerrar sesión"
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "empty": "Sin notificaciones",
+    "clearAll": "Limpiar",
+    "viewAll": "Ver todas las notificaciones",
+    "openMenu": "Abrir menú"
+  },
+  "help": {
+    "title": "Centro de Ayuda"
+  },
+  "notifTypes": {
+    "CYCLE_OPENED":              { "title": "Ciclo de {{month}} abierto",               "body": "El ciclo de {{month}} está disponible para envío. Accede a Mi Forecast para revisar y enviar tu forecast." },
+    "CYCLE_BLOCKED":             { "title": "Ciclo de {{month}} bloqueado",             "body": "El ciclo de {{month}} ha sido bloqueado temporalmente por un administrador." },
+    "CYCLE_FAILED":              { "title": "Error en el ciclo de {{month}}",            "body": "Ocurrió un error en la preparación del ciclo de {{month}}. Espera al equipo de TI." },
+    "CYCLE_STUCK":               { "title": "Ciclo de {{month}} bloqueado",             "body": "El ciclo de {{month}} está esperando una acción." },
+    "CYCLE_CLOSED":              { "title": "Ciclo de {{month}} cerrado",               "body": "El ciclo de {{month}} ha sido cerrado. Los datos siguen disponibles para consulta." },
+    "CYCLE_AWAITING_PREV_CLOSE": { "title": "Ciclo de {{month}} esperando cierre",      "body": "El ciclo de {{month}} espera el cierre de las entregas del ciclo anterior." },
+    "CYCLE_FULLY_APPROVED":      { "title": "Ciclo totalmente aprobado",                "body": "Todas las entregas del ciclo de {{month}} han sido aprobadas." },
+    "SUBMISSION_PENDING":        { "title": "Forecast enviado — {{unit}}" },
+    "SUBMISSION_APPROVED":       { "title": "Forecast aprobado — {{unit}}",  "body": "El forecast de {{month}} de la unidad {{unit}} fue aprobado." },
+    "SUBMISSION_REJECTED":       { "title": "Forecast rechazado — {{unit}}", "body": "El forecast de {{month}} de la unidad {{unit}} fue rechazado.", "bodyReason": "El forecast de {{month}} de la unidad {{unit}} fue rechazado: {{reason}}." }
+  },
+  "notificationsPage": {
+    "title": "Notificaciones",
+    "description": "Avisos sobre la apertura y el estado de los ciclos de forecast.",
+    "markAllRead": "Marcar todas como leídas",
+    "loading": "Cargando…",
+    "empty": "Sin notificaciones aún.",
+    "emptyHint": "Serás notificado cuando se abran nuevos ciclos."
+  },
+  "profile": {
+    "title": "Mi Cuenta",
+    "sectionPhoto": "Foto de Perfil",
+    "changePhoto": "Cambiar foto",
+    "savePhoto": "Guardar foto",
+    "removePhoto": "Eliminar foto",
+    "photoHint": "JPG, PNG o WEBP · Máx. 2 MB",
+    "sectionData": "Datos de la Cuenta",
+    "labelName": "Nombre de visualización",
+    "labelEmail": "Correo electrónico",
+    "sectionPassword": "Cambiar Contraseña",
+    "labelCurrentPassword": "Contraseña actual",
+    "labelNewPassword": "Nueva contraseña",
+    "saveChanges": "Guardar cambios",
+    "saving": "Guardando…",
+    "saved": "Guardado",
+    "errorSave": "Error al guardar"
+  },
+  "header": {
+    "platformName": "Sales Forecast",
+    "platformSub": "Web",
+    "dateFormat": "dd/MM HH:mm"
+  }
+}

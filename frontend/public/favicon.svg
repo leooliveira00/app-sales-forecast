@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Background rounded square -->
+  <rect width="32" height="32" rx="6" fill="#1e3a5f"/>
+
+  <!-- Bar chart bars (forecast/analytics) -->
+  <rect x="5" y="20" width="4" height="7" rx="1" fill="#2d5f8a"/>
+  <rect x="11" y="15" width="4" height="12" rx="1" fill="#2d5f8a"/>
+  <rect x="17" y="10" width="4" height="17" rx="1" fill="#0ea5e9"/>
+  <rect x="23" y="6" width="4" height="21" rx="1" fill="#0ea5e9"/>
+
+  <!-- Trend line connecting bar tops -->
+  <polyline points="7,20 13,15 19,10 25,6" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- Arrow head at the end of trend line -->
+  <polyline points="22,5 25,6 24,9" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

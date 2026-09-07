@@ -1,0 +1,21 @@
+# Override para rodar localmente SEM o Traefik (dev no Windows/Docker Desktop).
+# Docker Compose carrega este arquivo automaticamente junto com o docker-compose.yml
+# quando ambos estão no mesmo diretório — não precisa passar -f.
+#
+# O que ele faz:
+#   - remove o frontend da rede traefik-public e das labels de roteamento
+#   - expõe o frontend direto no host (http://localhost:${FRONTEND_PORT:-8080})
+#   - remove a network externa traefik-public (que não existe fora do servidor de prod/hml)
+#
+# Para voltar a rodar com Traefik (hml/prod), basta remover ou renomear este arquivo.
+
+services:
+  frontend:
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+    networks: !override
+      - app-network
+    labels: !override []
+
+networks:
+  traefik-public: !reset null
