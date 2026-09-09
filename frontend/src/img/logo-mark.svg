@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-labelledby="markTitle">
-  <title id="markTitle">Sales Forecast Web</title>
-  <rect width="48" height="48" rx="10" fill="#0f2942"/>
-  <rect x="9" y="27" width="7" height="12" rx="1.5" fill="#2d5f8a"/>
-  <rect x="20" y="19" width="7" height="20" rx="1.5" fill="#2d5f8a"/>
-  <rect x="31" y="10" width="7" height="29" rx="1.5" fill="#0ea5e9"/>
-  <polyline points="10,27 23,19 34,10" fill="none" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>

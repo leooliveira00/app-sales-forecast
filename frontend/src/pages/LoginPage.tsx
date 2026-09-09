@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { LogIn, AlertCircle } from 'lucide-react';
 import { LanguageSwitcher } from '../components/shared/LanguageSwitcher';
-import logo from '../img/logo-full.svg';
+import logoIcon from '../img/logo-icon.svg';
 
 export const LoginPage: React.FC = () => {
   const { login, isAuthenticated } = useAuth();
@@ -57,9 +57,9 @@ export const LoginPage: React.FC = () => {
       <div className="relative z-10 max-w-md w-full">
         <div className="text-center mb-6 md:mb-8">
           <img
-            src={logo}
+            src={logoIcon}
             alt="Sales Forecast Web"
-            className="mx-auto mb-4 md:mb-6 w-40 md:w-56 object-contain"
+            className="mx-auto mb-4 md:mb-6 w-20 h-20 md:w-24 md:h-24 rounded-2xl shadow-xl shadow-black/20"
           />
           <h1 className="text-2xl md:text-3xl font-semibold text-white mb-2">{t('title')}</h1>
           <p className="text-slate-400 text-sm md:text-base">{t('subtitle')}</p>

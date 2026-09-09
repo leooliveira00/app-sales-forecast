@@ -28,8 +28,7 @@ import { useTour } from '../../context/TourContext';
 import { cn } from '../shared/Common';
 import { AirflowIcon } from '../shared/AirflowIcon';
 import { Avatar } from '../shared/Avatar';
-import logo from '../../img/logo-full.svg';
-import logoMini from '../../img/logo-mark.svg';
+import logoIcon from '../../img/logo-icon.svg';
 
 interface SidebarProps {
   collapsed: boolean;
@@ -228,9 +227,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggle, mobileOpe
       <div className="relative border-b border-white/10 shrink-0">
         {collapsed ? (
           <div className="flex flex-col items-center gap-3 py-4 px-2">
-            <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-lg shadow-black/20 overflow-hidden">
-              <img src={logoMini} alt="Sales Forecast Web" className="w-9 h-9 object-contain" />
-            </div>
+            <img src={logoIcon} alt="Sales Forecast Web" className="w-10 h-10 rounded-lg shadow-lg shadow-black/20" />
             <button
               onClick={onToggle}
               className="hidden md:block p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
@@ -278,7 +275,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggle, mobileOpe
           </div>
         ) : (
           <div className="flex flex-col items-center pt-5 pb-4 px-4">
-            <img src={logo} alt="Sales Forecast Web" className="w-full max-w-[180px] object-contain" />
+            <div className="flex flex-col items-center gap-3">
+              <img src={logoIcon} alt="Sales Forecast Web" className="w-14 h-14 rounded-xl shadow-lg shadow-black/20 shrink-0" />
+              <p className="text-base font-bold text-white leading-tight truncate">Sales Forecast</p>
+            </div>
             <button
               onClick={onToggle}
               className="absolute top-2 right-2 hidden md:block p-1 text-slate-500 hover:text-slate-300 hover:bg-white/10 rounded-lg transition-colors"

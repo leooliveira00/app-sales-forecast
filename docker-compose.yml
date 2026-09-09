@@ -64,8 +64,6 @@ services:
   frontend:
     build:
       context: ./frontend
-      args:
-        GEMINI_API_KEY: ${GEMINI_API_KEY:-}
     container_name: ${ENV_PREFIX:-prod}-sales-forecast-web-frontend
     restart: unless-stopped
     depends_on:

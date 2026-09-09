@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-labelledby="faviconTitle">
-  <title id="faviconTitle">Sales Forecast Web</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-labelledby="logoIconTitle">
+  <title id="logoIconTitle">Sales Forecast Web</title>
   <rect width="48" height="48" rx="11" fill="#0f2942"/>
   <!-- Pulso (ECG) — remete a dispositivos médicos -->
   <path d="M6 32 L12 32 L15 20 L19 39 L23 26 L27 32" fill="none" stroke="#2d5f8a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>

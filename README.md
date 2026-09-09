@@ -113,7 +113,6 @@ Principais variáveis (veja todas comentadas em [.env.example](.env.example)):
 | `AIRFLOW_BASE_URL` / `AIRFLOW_USER` / `AIRFLOW_PASSWORD` | Integração com Airflow — o backend exige as 3 definidas no start, mas qualquer valor placeholder serve se você não for rodar Airflow |
 | `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` / `POSTGRES_PORT` | Credenciais e porta do PostgreSQL (porta padrão exposta no host: `5433`) |
 | `ADMIN_INITIAL_EMAIL` / `ADMIN_INITIAL_PASSWORD` | Cria um usuário admin no primeiro start, se ainda não existir |
-| `GEMINI_API_KEY` | Placeholder de integração com Google Generative AI — não é usado por nenhum código do frontend atualmente; pode deixar em branco |
 
 ### 2. Subir os serviços
 
