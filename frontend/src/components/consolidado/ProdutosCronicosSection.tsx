@@ -96,8 +96,8 @@ const CronicoModal: React.FC<{
                   tickFormatter={(v: number) => `${v.toFixed(0)}%`} width={42} />
                 <Tooltip
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                  formatter={(v: number, name: string) => [
-                    name === achievLabel ? `${v.toFixed(1)}%` : fmt(v), name,
+                  formatter={(v, name) => [
+                    name === achievLabel ? `${Number(v).toFixed(1)}%` : fmt(Number(v)), name,
                   ]}
                 />
                 <Legend iconType="circle" wrapperStyle={{ paddingTop: '12px', fontSize: '11px' }} />

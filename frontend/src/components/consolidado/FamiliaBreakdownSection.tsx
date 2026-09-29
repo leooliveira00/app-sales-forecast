@@ -300,7 +300,7 @@ export const FamiliaBreakdownSection: React.FC<FamiliaBreakdownSectionProps> = (
                       tickFormatter={(v) => v > 0 ? fmt(v) : '0'} />
                     <Tooltip
                       contentStyle={{ borderRadius: '10px', border: 'none', boxShadow: '0 4px 12px rgb(0 0 0 / 0.1)' }}
-                      formatter={(v: number, name: string) => [fmt(v), name]}
+                      formatter={(v, name) => [fmt(Number(v)), name]}
                     />
                     <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', paddingTop: '8px' }} />
                     <Bar    dataKey="Vendas" name={t('legend.vendas', { ns: 'dashboard' }) as string} fill="#0d9488" radius={[3, 3, 0, 0]} barSize={12} />
@@ -569,7 +569,7 @@ export const FamiliaBreakdownSection: React.FC<FamiliaBreakdownSectionProps> = (
                                               tickFormatter={(v) => v > 0 ? fmt(v) : '0'} />
                                             <Tooltip
                                               contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgb(0 0 0 / 0.1)', fontSize: 10 }}
-                                              formatter={(v: number, name: string) => [fmt(v), name]}
+                                              formatter={(v, name) => [fmt(Number(v)), name]}
                                             />
                                             <Legend iconType="circle" wrapperStyle={{ fontSize: '9px', paddingTop: '4px' }} />
                                             <Bar  dataKey="Vendas" name={t('legend.vendas', { ns: 'dashboard' }) as string} fill="#0d9488" radius={[2, 2, 0, 0]} barSize={10} />

@@ -68,7 +68,7 @@ export const EvolucaoMensalChart: React.FC<EvolucaoMensalChartProps> = ({ data, 
             boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
             fontSize: isMobile ? '11px' : '13px',
           }}
-          formatter={(v: number, name: string) => [fmt(v), name]}
+          formatter={(v, name) => [fmt(Number(v)), name]}
         />
         {!isMobile && <Legend iconType="circle" wrapperStyle={{ paddingTop: '16px' }} />}
         <Line
