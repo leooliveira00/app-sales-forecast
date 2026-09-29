@@ -691,7 +691,6 @@ export const getForecastItemsAnnual = async (
   const cacheKey = `annual|${unidadeVendaId}|${refMonth}|${paisIso3Filter ?? ""}`;
   const cached = appCache.get(cacheKey);
   if (cached && Date.now() < cached.expiresAt) {
-    console.log(`[DEBUG-ADD][A1] getForecastItemsAnnual — CACHE HIT cacheKey=${cacheKey}`);
     return cached.data;
   }
 
@@ -700,7 +699,6 @@ export const getForecastItemsAnnual = async (
     orderBy: { executedAt: "desc" },
     select:  { id: true, windowStart: true, windowEnd: true, leadTimeMonths: true, refMonth: true },
   });
-  console.log(`[DEBUG-ADD][A2] getForecastItemsAnnual — refMonth=${refMonth} runId resolvido=${run?.id ?? 'NOT FOUND'}`);
   if (!run) {
     const empty = { run: null, products: [] };
     appCache.set(cacheKey, empty, 2 * 60 * 1000);
