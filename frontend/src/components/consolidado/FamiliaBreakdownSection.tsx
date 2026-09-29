@@ -183,6 +183,28 @@ export const FamiliaBreakdownSection: React.FC<FamiliaBreakdownSectionProps> = (
     Vendas: m.vendas,
   }));
 
+  // Badges de acurácia/bias — reaproveitados no layout mobile e desktop do toolbar
+  const accuracyBiasBadges = acuraciaUnit && (
+    <>
+      <span className={cn(
+        'text-[10px] font-bold px-2 py-0.5 rounded-full border',
+        acuraciaUnit.acuracia >= 90 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+        acuraciaUnit.acuracia >= 75 ? 'bg-amber-50   text-amber-700   border-amber-200'   :
+                                      'bg-red-50     text-red-700     border-red-200',
+      )}>
+        {t('breakdown.accuracy')} {acuraciaUnit.acuracia.toFixed(1)}%
+      </span>
+      <span className={cn(
+        'text-[10px] font-bold px-2 py-0.5 rounded-full border',
+        acuraciaUnit.bias > 5  ? 'bg-orange-50 text-orange-700 border-orange-200' :
+        acuraciaUnit.bias < -5 ? 'bg-sky-50     text-sky-700    border-sky-200'   :
+                                 'bg-emerald-50 text-emerald-700 border-emerald-200',
+      )}>
+        {t('breakdown.bias')} {acuraciaUnit.bias > 0 ? '+' : ''}{acuraciaUnit.bias.toFixed(1)}%
+      </span>
+    </>
+  );
+
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div>
@@ -294,33 +316,21 @@ export const FamiliaBreakdownSection: React.FC<FamiliaBreakdownSectionProps> = (
 
       <div className="space-y-2">
         {/* Toolbar */}
-        <div className={cn('flex mb-1 px-1 gap-2', isMobile ? 'flex-col' : 'items-center justify-between flex-wrap')}>
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-            {t('breakdown.summaryProducts', { count: produtos.length })}
-            {' · '}
-            {t('breakdown.summaryFamilies', { count: familiasUnit.length })}
-          </span>
-          <div className="flex items-center gap-2 ml-auto flex-wrap">
-            {acuraciaUnit && (
-              <>
-                <span className={cn(
-                  'text-[10px] font-bold px-2 py-0.5 rounded-full border',
-                  acuraciaUnit.acuracia >= 90 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                  acuraciaUnit.acuracia >= 75 ? 'bg-amber-50   text-amber-700   border-amber-200'   :
-                                                'bg-red-50     text-red-700     border-red-200',
-                )}>
-                  {t('breakdown.accuracy')} {acuraciaUnit.acuracia.toFixed(1)}%
-                </span>
-                <span className={cn(
-                  'text-[10px] font-bold px-2 py-0.5 rounded-full border',
-                  acuraciaUnit.bias > 5  ? 'bg-orange-50 text-orange-700 border-orange-200' :
-                  acuraciaUnit.bias < -5 ? 'bg-sky-50     text-sky-700    border-sky-200'   :
-                                           'bg-emerald-50 text-emerald-700 border-emerald-200',
-                )}>
-                  {t('breakdown.bias')} {acuraciaUnit.bias > 0 ? '+' : ''}{acuraciaUnit.bias.toFixed(1)}%
-                </span>
-              </>
+        <div className={cn('flex mb-1 px-1 gap-2', isMobile ? 'flex-col gap-1.5' : 'items-center justify-between flex-wrap')}>
+          <div className="flex items-center gap-2 flex-wrap justify-between">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap">
+              {t('breakdown.summaryProducts', { count: produtos.length })}
+              {' · '}
+              {t('breakdown.summaryFamilies', { count: familiasUnit.length })}
+            </span>
+            {isMobile && accuracyBiasBadges && (
+              <div className="flex items-center gap-2 flex-wrap">
+                {accuracyBiasBadges}
+              </div>
             )}
+          </div>
+          <div className={cn('flex items-center gap-2 flex-wrap', !isMobile && 'ml-auto')}>
+            {!isMobile && accuracyBiasBadges}
             {/* Sort das famílias */}
             <div className="flex items-center gap-1 border border-slate-200 rounded-lg px-1.5 py-0.5 bg-white">
               <ArrowUpDown className="w-2.5 h-2.5 text-slate-400" />
