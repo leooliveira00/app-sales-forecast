@@ -472,8 +472,8 @@ export const ConsolidadoGestorPage: React.FC = () => {
     <div className="space-y-8">
       {/* Header — sempre visível */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2.5 flex-wrap">
+        <div className="text-center sm:text-left">
+          <div className="flex items-center gap-2.5 flex-wrap justify-center sm:justify-start">
             <h2 className="text-2xl font-bold text-slate-900 tracking-tight">{t('title')}</h2>
             {unidade && (
               <span className="px-2 py-0.5 bg-sky-50 text-sky-700 text-[11px] font-bold rounded-full border border-sky-200">
@@ -481,7 +481,7 @@ export const ConsolidadoGestorPage: React.FC = () => {
               </span>
             )}
             {data?.run && (
-              <span className="px-2 py-0.5 bg-sky-50 text-sky-700 text-[11px] font-bold rounded-full border border-sky-100">
+              <span className="hidden sm:inline-block px-2 py-0.5 bg-sky-50 text-sky-700 text-[11px] font-bold rounded-full border border-sky-100">
                 {t('abbr.orc')} {data.run.ano}
               </span>
             )}
