@@ -1,6 +1,7 @@
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { HttpError } from "../utils/http-error.js";
 
 export const AVATAR_UPLOAD_DIR = path.join(process.cwd(), "uploads", "avatars");
 
@@ -18,7 +19,7 @@ const fileFilter: multer.Options["fileFilter"] = (_req, file, cb) => {
   if (file.mimetype in AVATAR_EXTENSIONS) {
     cb(null, true);
   } else {
-    cb(new Error("Formato inválido. Use JPG, PNG ou WEBP."));
+    cb(new HttpError(400, "Formato inválido. Use JPG, PNG ou WEBP."));
   }
 };
 

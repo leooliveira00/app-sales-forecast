@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import path from "path";
 import { validateEnv } from "./config/env.js";
 import routes from "./routes/index.js";
+import { errorHandler, notFoundHandler } from "./middleware/error.middleware.js";
 
 dotenv.config();
 validateEnv();
@@ -31,5 +32,10 @@ app.use(express.json({ limit: "10mb" }));
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 app.use("/api", routes);
+app.use("/api", notFoundHandler);
+
+// Sempre por último: captura erros síncronos e os passados via next(err).
+// Express 4 não captura rejeições de handlers async — esses seguem com try/catch próprio.
+app.use(errorHandler);
 
 export default app;
