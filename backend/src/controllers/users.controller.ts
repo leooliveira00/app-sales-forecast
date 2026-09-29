@@ -2,6 +2,7 @@ import { Response } from "express";
 import path from "path";
 import fs from "fs";
 import { AuthRequest } from "../middleware/auth.middleware.js";
+import { AVATAR_UPLOAD_DIR, AVATAR_EXTENSIONS } from "../middleware/upload.middleware.js";
 import * as UsersService from "../services/users.service.js";
 import { ALL_ROLES, ADMIN_ROLES } from "../constants/roles.js";
 
@@ -119,14 +120,24 @@ export const uploadAvatar = async (req: AuthRequest, res: Response) => {
   }
 
   try {
-    // Remove arquivo antigo se existir
+    // Só grava em disco para usuários existentes — também impede que um :id
+    // arbitrário (ex.: com "../") vire parte do caminho do arquivo.
     const existing = await UsersService.findById(id);
-    if (existing?.avatarUrl) {
+    if (!existing) {
+      return res.status(404).json({ error: "Usuário não encontrado." });
+    }
+
+    // Timestamp no nome garante que o novo arquivo nunca tenha o mesmo caminho
+    // do antigo (antes, mesma extensão = o "antigo" removido era o recém-enviado).
+    const filename = `avatar-${id}-${Date.now()}${AVATAR_EXTENSIONS[req.file.mimetype]}`;
+    fs.writeFileSync(path.join(AVATAR_UPLOAD_DIR, filename), req.file.buffer);
+
+    if (existing.avatarUrl) {
       const oldPath = path.join(process.cwd(), existing.avatarUrl.replace(/^\//, ""));
       if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
     }
 
-    const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+    const avatarUrl = `/uploads/avatars/${filename}`;
     await UsersService.updateAvatar(id, avatarUrl);
     res.json({ avatarUrl });
   } catch {

@@ -2,31 +2,31 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 
-const UPLOAD_DIR = path.join(process.cwd(), "uploads", "avatars");
+export const AVATAR_UPLOAD_DIR = path.join(process.cwd(), "uploads", "avatars");
 
 // Garante que o diretório existe
-fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+fs.mkdirSync(AVATAR_UPLOAD_DIR, { recursive: true });
 
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
-  filename: (req, _file, cb) => {
-    const userId = req.params.id;
-    const ext    = path.extname(_file.originalname).toLowerCase() || ".jpg";
-    cb(null, `avatar-${userId}${ext}`);
-  },
-});
+// Extensão derivada do mimetype validado, nunca do nome enviado pelo cliente.
+export const AVATAR_EXTENSIONS: Record<string, string> = {
+  "image/jpeg": ".jpg",
+  "image/png":  ".png",
+  "image/webp": ".webp",
+};
 
 const fileFilter: multer.Options["fileFilter"] = (_req, file, cb) => {
-  const allowed = ["image/jpeg", "image/png", "image/webp"];
-  if (allowed.includes(file.mimetype)) {
+  if (file.mimetype in AVATAR_EXTENSIONS) {
     cb(null, true);
   } else {
     cb(new Error("Formato inválido. Use JPG, PNG ou WEBP."));
   }
 };
 
+// memoryStorage: o arquivo fica só em buffer até o controller validar a permissão.
+// Com diskStorage o multer gravava em disco antes da checagem de autorização,
+// permitindo que qualquer usuário autenticado sobrescrevesse o avatar de outro.
 export const avatarUpload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 2 * 1024 * 1024 },
   fileFilter,
 });
