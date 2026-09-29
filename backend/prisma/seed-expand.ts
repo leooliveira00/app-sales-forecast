@@ -28,7 +28,6 @@ const DRY_RUN = process.argv.includes("--dry-run");
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const d    = (y: number, m: number) => new Date(Date.UTC(y, m - 1, 1));
-const mk   = (y: number, m: number) => `${y}-${String(m).padStart(2, "0")}`;
 
 /** Pseudo-aleatório determinístico — reproduzível sem biblioteca externa */
 const rnd = (base: number, seed: number, variance = 0.12) => {
@@ -237,7 +236,7 @@ async function seedForecastRuns2026(
   let runCount  = 0;
   let itemCount = 0;
 
-  for (const [mi, month] of FUTURE_MONTHS.entries()) {
+  for (const month of FUTURE_MONTHS) {
     let run = await prisma.forecastRun.findFirst({
       where: { refMonth: d(2026, month), status: "SUCCESS" },
     });
@@ -258,7 +257,6 @@ async function seedForecastRuns2026(
 
     for (const [li, lk] of links.entries()) {
       const seasonal  = SEASONAL[month - 1];
-      const volumeORC = rnd(Math.round(lk.baseMensal2026 * seasonal), li + month * 500 + 22222);
       const volumeIA  = rnd(Math.round(lk.baseMensal2026 * seasonal), li + month * 500 + 33333, 0.10);
       const estoque   = rnd(Math.round(lk.baseMensal2026 * 2),        li + month * 500 + 44444);
 
@@ -303,7 +301,7 @@ async function seedVendas2026(
   let count = 0;
 
   for (const [li, lk] of links.entries()) {
-    for (const [mi, month] of FUTURE_MONTHS.entries()) {
+    for (const month of FUTURE_MONTHS) {
       const seasonal   = SEASONAL[month - 1];
       // Venda projetada ≈ 92–102% do ORC
       const quantidade = rnd(Math.round(lk.baseMensal2026 * seasonal), li + month * 700 + 55555, 0.08);
@@ -382,11 +380,10 @@ async function seedOverrides2025(
     for (const [li, lk] of links.entries()) {
       const seasonal   = SEASONAL[month - 1];
       const base2025   = Math.round(lk.baseMensal2026 / GROWTH_2026);
-      const volumeORC  = rnd(Math.round(base2025 * seasonal), li + month * 317 + 11111); // = OrcamentoItem 2025
       const volumeIA   = rnd(Math.round(base2025 * seasonal), li + month * 317 + 66666, 0.10);
       const volumeFCTS = rnd(Math.round(base2025 * seasonal), li + month * 317 + 77777, 0.08);
 
-      let item = !DRY_RUN && run
+      const item = !DRY_RUN && run
         ? await prisma.forecastItem.upsert({
             where: {
               runId_produtoId_unidadeVendaId_month_paisIso3: {

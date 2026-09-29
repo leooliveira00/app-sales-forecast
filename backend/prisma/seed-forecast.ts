@@ -136,7 +136,7 @@ async function loadForecast() {
   for (const refMonthStr of refMonths) {
     let refDate: Date;
     try { refDate = toDate(refMonthStr); }
-    catch (e: any) {
+    catch {
       console.warn(`  [aviso] refMonth inválido "${refMonthStr}" — ciclo ignorado.`);
       continue;
     }
@@ -209,7 +209,7 @@ async function loadForecast() {
 
     let month: Date;
     try { month = toDate(row.month?.trim()); }
-    catch (e: any) {
+    catch {
       console.warn(`  [aviso] Data inválida "${row.month}" — linha ignorada.`);
       skipped++; continue;
     }

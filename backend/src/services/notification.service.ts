@@ -1,3 +1,4 @@
+import { Perfil } from "@prisma/client";
 import prisma from "../config/prisma.js";
 
 export const createForRole = async (
@@ -8,7 +9,7 @@ export const createForRole = async (
   refMonth?: Date | string
 ) => {
   const users = await prisma.user.findMany({
-    where: { perfil: perfil as any },
+    where: { perfil: perfil as Perfil },
     select: { id: true },
   });
 

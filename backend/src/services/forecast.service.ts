@@ -59,11 +59,11 @@ export const listRuns = async (options?: {
   // operador_pcp and admin_ti see all SUCCESS runs regardless of availability
   const isAdmin = !options?.perfil || ["operador_pcp", "admin_ti"].includes(options.perfil);
 
-  const where: Record<string, unknown> = { status: "SUCCESS" };
+  const where: Prisma.ForecastRunWhereInput = { status: "SUCCESS" };
   if (options?.refMonth) where.refMonth = new Date(options.refMonth);
 
   const allRuns = await prisma.forecastRun.findMany({
-    where:   where as any,
+    where,
     orderBy: { executedAt: "desc" },
     include: { _count: { select: { items: true } } },
   });
@@ -1591,8 +1591,6 @@ export const getUnitTendencia = async (
     monthKeys.push(d.toISOString().substring(0, 7));
   }
 
-  const MESES = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
-
   // ── Fast path: snapshot agregado (sem filtro de país) ────────────────────
   // ConsolidadoMesSnapshot já contém ORC/FCTS/Vendas por (unidadeVendaId, refMonth).
   // Cada refMonth pertence a exatamente um orcamentoAno (o seu próprio ano), então
@@ -1611,7 +1609,6 @@ export const getUnitTendencia = async (
     }
 
     return monthKeys.map((mk) => {
-      const [year, month] = mk.split("-").map(Number);
       const snap = snapByMonth.get(mk);
       return {
         month:  mk,
@@ -1698,7 +1695,6 @@ export const getUnitTendencia = async (
 
   // 4. Série temporal
   return monthKeys.map((mk) => {
-    const [year, month] = mk.split("-").map(Number);
     return {
       month:  mk,
       orc:    orcByMonth.get(mk)    ?? 0,

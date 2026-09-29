@@ -142,7 +142,6 @@ async function main() {
 
     // 5. ForecastRun Jan-Dez/2026 + ForecastItem por país (paisIso3 no item)
     for (const refMonthNum of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]) {
-      const refDate     = new Date(Date.UTC(2026, refMonthNum - 1, 1));
       const windowStart = new Date(Date.UTC(2026, refMonthNum - 1 + LEAD_TIME, 1));
       const windowEnd   = new Date(Date.UTC(2026, refMonthNum - 1 + LEAD_TIME + WINDOW_SIZE - 1, 1));
 

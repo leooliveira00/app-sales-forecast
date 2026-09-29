@@ -99,7 +99,6 @@ export async function testConnection(): Promise<ConnectionStatus> {
     // Depois confirma que as credenciais funcionam num endpoint protegido
     const authRes = await afFetch("/dags?limit=1");
     if (!authRes.ok) {
-      const body = await authRes.text().catch(() => "");
       const hint = authRes.status === 401
         ? " — Basic Auth não está ativo no Airflow ou as credenciais são inválidas."
         : "";

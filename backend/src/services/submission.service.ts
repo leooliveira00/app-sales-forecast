@@ -405,7 +405,6 @@ export const getPreview = async (submissionId: string) => {
     select: { id: true },
   });
 
-  let prevFctsTotal = 0;
   const prevFctsByMonth          = new Map<string, number>(); // YYYY-MM → total unidade
   const prevFctsByProduto        = new Map<string, number>(); // produtoId → total anual
   const prevFctsByProdutoMes     = new Map<string, number>(); // produtoId|YYYY-MM → fcts
@@ -430,7 +429,6 @@ export const getPreview = async (submissionId: string) => {
     for (const i of prevItems) {
       const mk   = i.month.toISOString().substring(0, 7);
       const fcts = i.overrides[0]?.volumeFCTS ?? 0;
-      prevFctsTotal += fcts;
       prevFctsByMonth.set(mk, (prevFctsByMonth.get(mk) ?? 0) + fcts);
       prevFctsByProduto.set(i.produtoId, (prevFctsByProduto.get(i.produtoId) ?? 0) + fcts);
       prevFctsByProdutoMes.set(`${i.produtoId}|${mk}`, (prevFctsByProdutoMes.get(`${i.produtoId}|${mk}`) ?? 0) + fcts);

@@ -93,7 +93,7 @@ async function main() {
   const unidadesInconcl  = new Set<string>(); // fetch falhou/vazio → não marcar órfão (segurança)
 
   for (const { unidadeVendaId } of unidadesComBackfill) {
-    let itens: ProtheusItem[] = [];
+    const itens: ProtheusItem[] = [];
     let falhou = false;
     for (const route of routes) {
       try { itens.push(...await fetchPrevisoes(unidadeVendaId, route, auth, base)); }

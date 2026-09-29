@@ -330,8 +330,8 @@ async function loadVendas() {
 
     let month: Date;
     try { month = toDate(row.month?.trim()); }
-    catch (e: any) {
-      console.warn(`  [aviso] Data inválida "${row.month}" — linha ignorada. (${e.message})`);
+    catch (e) {
+      console.warn(`  [aviso] Data inválida "${row.month}" — linha ignorada. (${(e as Error).message})`);
       skipped++; continue;
     }
 
@@ -346,8 +346,8 @@ async function loadVendas() {
 
     let quantidade: number;
     try { quantidade = toInt(row.quantidade?.trim(), "quantidade"); }
-    catch (e: any) {
-      console.warn(`  [aviso] ${e.message} — linha ignorada.`);
+    catch (e) {
+      console.warn(`  [aviso] ${(e as Error).message} — linha ignorada.`);
       skipped++; continue;
     }
 
@@ -429,15 +429,15 @@ async function loadOrcamento() {
 
     let month: Date;
     try { month = toDate(row.month?.trim()); }
-    catch (e: any) {
+    catch {
       console.warn(`  [aviso] Data inválida "${row.month}" — linha ignorada.`);
       skipped++; continue;
     }
 
     let volumeORC: number;
     try { volumeORC = toInt(row.volumeORC?.trim(), "volumeORC"); }
-    catch (e: any) {
-      console.warn(`  [aviso] ${e.message} — linha ignorada.`);
+    catch (e) {
+      console.warn(`  [aviso] ${(e as Error).message} — linha ignorada.`);
       skipped++; continue;
     }
 
@@ -476,7 +476,7 @@ async function loadForecast() {
   for (const refMonthStr of refMonths) {
     let refDate: Date;
     try { refDate = toDate(refMonthStr); }
-    catch (e: any) {
+    catch {
       console.warn(`  [aviso] refMonth inválido "${refMonthStr}" — ciclo ignorado.`);
       continue;
     }
@@ -544,7 +544,7 @@ async function loadForecast() {
 
     let month: Date;
     try { month = toDate(row.month?.trim()); }
-    catch (e: any) {
+    catch {
       console.warn(`  [aviso] Data inválida "${row.month}" — linha ignorada.`);
       skipped++; continue;
     }
