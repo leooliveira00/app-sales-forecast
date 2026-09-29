@@ -3,6 +3,7 @@ import {
   ComposedChart, Bar, Line, XAxis, YAxis, Tooltip,
   ResponsiveContainer, Cell,
 } from 'recharts';
+import type { ChartTooltipProps } from '../../types/chart';
 import { TrendingUp, ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../shared/Common';
@@ -67,12 +68,12 @@ const Kpi: React.FC<KpiProps> = ({ label, value, sublabel, sublabelColor = 'neut
 
 // ── Tooltip ───────────────────────────────────────────────────────────────────
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label }: ChartTooltipProps) => {
   const { t } = useTranslation('forecast');
   if (!active || !payload?.length) return null;
-  const vendas = payload.find((p: any) => p.dataKey === 'vendas')?.value;
-  const orc    = payload.find((p: any) => p.dataKey === 'orc')?.value;
-  const fcts   = payload.find((p: any) => p.dataKey === 'fcts')?.value;
+  const vendas = payload.find((p) => p.dataKey === 'vendas')?.value;
+  const orc    = payload.find((p) => p.dataKey === 'orc')?.value;
+  const fcts   = payload.find((p) => p.dataKey === 'fcts')?.value;
   return (
     <div className="bg-white border border-slate-200 rounded-lg px-3 py-2 shadow-lg text-xs space-y-0.5">
       <p className="font-semibold text-slate-600 mb-1">{label}</p>

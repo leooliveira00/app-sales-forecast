@@ -42,7 +42,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onMobileMenuToggle }) => {
   const navigate  = useNavigate();
-  const { user, token } = useAuth();
+  const { token } = useAuth();
   const { t, i18n } = useTranslation('layout');
   const { openHelp } = useHelp();
 

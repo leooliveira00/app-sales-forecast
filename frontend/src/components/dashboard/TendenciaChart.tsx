@@ -3,6 +3,8 @@ import {
   ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Cell, ReferenceLine,
 } from 'recharts';
+import type { MouseHandlerDataParam } from 'recharts';
+import type { ChartTooltipProps } from '../../types/chart';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../shared/Common';
 import { CHART_COLORS } from '../../constants/chartColors';
@@ -27,13 +29,13 @@ interface TendenciaChartProps {
   onBarClick?: (point: TendenciaPoint & { desvio: number }) => void;
 }
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label }: ChartTooltipProps) => {
   const { t } = useTranslation('dashboard');
   if (!active || !payload?.length) return null;
-  const orc    = payload.find((p: any) => p.dataKey === 'orc')?.value;
-  const fcts   = payload.find((p: any) => p.dataKey === 'fcts')?.value;
-  const vendas = payload.find((p: any) => p.dataKey === 'vendas')?.value;
-  const desvio = payload.find((p: any) => p.dataKey === 'desvio')?.value;
+  const orc    = payload.find((p) => p.dataKey === 'orc')?.value;
+  const fcts   = payload.find((p) => p.dataKey === 'fcts')?.value;
+  const vendas = payload.find((p) => p.dataKey === 'vendas')?.value;
+  const desvio = payload.find((p) => p.dataKey === 'desvio')?.value;
 
   return (
     <div className="bg-white border border-slate-200 rounded-xl px-4 py-3 shadow-lg text-xs space-y-1 min-w-[160px]">
@@ -68,10 +70,12 @@ export const TendenciaChart: React.FC<TendenciaChartProps> = ({ data, onBarClick
     };
   });
 
-  const handleChartClick = (state: any) => {
+  const handleChartClick = (state: MouseHandlerDataParam) => {
     if (!onBarClick) return;
-    const idx = state?.activeTooltipIndex ?? state?.activeIndex;
-    if (idx == null || idx < 0 || idx >= chartData.length) return;
+    const rawIdx = state.activeTooltipIndex ?? state.activeIndex;
+    if (rawIdx == null) return;
+    const idx = Number(rawIdx);
+    if (!Number.isInteger(idx) || idx < 0 || idx >= chartData.length) return;
     const point = chartData[idx];
     if (!point || point.desvio == null) return;
     onBarClick(point as TendenciaPoint & { desvio: number });

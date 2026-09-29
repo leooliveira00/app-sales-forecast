@@ -29,14 +29,6 @@ interface AcuraciaUnidade {
   totalVendas:   number;
 }
 
-interface TendenciaPoint {
-  month:  string;
-  label:  string;
-  orc:    number;
-  fcts:   number;
-  vendas: number;
-}
-
 interface MesData {
   month: string;
   orc: number;
@@ -210,19 +202,14 @@ export const ConsolidadoGestorPage: React.FC = () => {
   // ── Chaves de cache por fonte ─────────────────────────────────────────────
   // "-leve" distingue do cache full (Fase 3 busca detalhe por unidade separadamente)
   const mainCacheKey  = `consolidado-gestor-leve|${startMonth}|${endMonth}|${uCodigo}`;
-  const tendCacheKey  = `tendencia|${uCodigo}`;
   const acurCacheKey  = `acuracia-gestor|${mesesCount}|${endMonth}|${uCodigo}`;
 
   // ── Estado: lê cache sincronamente na inicialização ───────────────────────
   const [data,      setData]      = useState<ConsolidadoData | null>(() =>
     consolidadoCache.getCached(mainCacheKey) as ConsolidadoData | null ?? null
   );
-  const [tendencia, setTendencia] = useState<TendenciaPoint[]>(() =>
-    consolidadoCache.getCached(tendCacheKey) as TendenciaPoint[] ?? []
-  );
   const [cronicos,  setCronicos]  = useState<ProdutoCronico[]>([]);
   const [isLoadingMain,      setIsLoadingMain]      = useState<boolean>(() => !consolidadoCache.getCached(mainCacheKey));
-  const [isLoadingTendencia, setIsLoadingTendencia] = useState<boolean>(() => !consolidadoCache.getCached(tendCacheKey));
   const [isLoadingCronicos,  setIsLoadingCronicos]  = useState<boolean>(true);
   const [acuraciaGestor,     setAcuraciaGestor]     = useState<{ acuracia: number; bias: number; ciclosValidos: number; totalVendas: number } | null>(() =>
     consolidadoCache.getCached(acurCacheKey) as { acuracia: number; bias: number; ciclosValidos: number; totalVendas: number } | null ?? null
@@ -271,29 +258,6 @@ export const ConsolidadoGestorPage: React.FC = () => {
       if (!ctrl.signal.aborted) setIsLoadingMain(false);
     }
   }, [token, startMonth, endMonth, uCodigo, consolidadoCache, mainCacheKey, showToast]);
-
-  // ── Fetch: tendência (janela-independente — usa janela fixa interna) ───────
-  const fetchTendenciaData = useCallback(async (bustCache = false) => {
-    if (!uCodigo) return;
-    if (!bustCache) {
-      const cached = consolidadoCache.getCached(tendCacheKey) as TendenciaPoint[] | null;
-      if (cached) { setTendencia(cached); setIsLoadingTendencia(false); return; }
-    }
-    setIsLoadingTendencia(true);
-    try {
-      const res = await fetch(
-        `/api/forecast/tendencia?unidadeVendaId=${encodeURIComponent(uCodigo)}`,
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
-      const d: TendenciaPoint[] = res.ok ? await res.json() : [];
-      setTendencia(d);
-      consolidadoCache.setCached(tendCacheKey, d);
-    } catch {
-      setTendencia([]);
-    } finally {
-      setIsLoadingTendencia(false);
-    }
-  }, [token, uCodigo, consolidadoCache, tendCacheKey]);
 
   // ── Fetch: produtos crônicos (janela-independente) ────────────────────────
   const fetchCronicosData = useCallback(async () => {
@@ -374,7 +338,6 @@ export const ConsolidadoGestorPage: React.FC = () => {
 
   // Dispara todos os fetches em paralelo; cada um resolve e atualiza seu estado independentemente
   useEffect(() => { fetchMainData();            }, [fetchMainData]);
-  useEffect(() => { fetchTendenciaData();       }, [fetchTendenciaData]);
   useEffect(() => { fetchCronicosData();        }, [fetchCronicosData]);
   useEffect(() => { fetchAcuraciaGestorData();  }, [fetchAcuraciaGestorData]);
   useEffect(() => { fetchUnitDetail();          }, [fetchUnitDetail]);
@@ -427,11 +390,10 @@ export const ConsolidadoGestorPage: React.FC = () => {
     setCountryDetail(null);
     setPaisesUnit([]);
     fetchMainData(true);
-    fetchTendenciaData(true);
     fetchCronicosData();
     fetchAcuraciaGestorData(true);
     fetchUnitDetail();
-  }, [fetchMainData, fetchTendenciaData, fetchCronicosData, fetchAcuraciaGestorData, fetchUnitDetail]);
+  }, [fetchMainData, fetchCronicosData, fetchAcuraciaGestorData, fetchUnitDetail]);
 
   // Acurácia e Bias vindos do snapshot via fetchAcuraciaGestorData
   const acuraciaPeriodo = acuraciaGestor?.acuracia ?? null;

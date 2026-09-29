@@ -528,7 +528,9 @@ export const ProtheusExportPage: React.FC = () => {
       });
       if (!res.ok) return;
       setLogs(await res.json());
-    } catch {}
+    } catch {
+      // Falha de rede no polling: mantém a lista atual e tenta de novo no próximo ciclo.
+    }
   }, [token]);
 
   // ── Polling ─────────────────────────────────────────────────────────────────
@@ -613,7 +615,9 @@ export const ProtheusExportPage: React.FC = () => {
           return next;
         });
       }
-    } catch {}
+    } catch {
+      // Detalhe é opcional: sem ele a linha só não expande.
+    }
   };
 
   // ── Unit selection helpers ──────────────────────────────────────────────────

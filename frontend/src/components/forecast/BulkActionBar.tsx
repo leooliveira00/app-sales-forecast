@@ -14,7 +14,7 @@ interface BulkActionBarProps {
 }
 
 export const BulkActionBar: React.FC<BulkActionBarProps> = ({
-  familiaItems, isExport, fcts, onApplyPercent, onSetValue, onCopyPrevious, hasPrevious,
+  familiaItems, isExport, onApplyPercent, onSetValue, onCopyPrevious, hasPrevious,
 }) => {
   const { t } = useTranslation('forecast');
   const [pctInput, setPctInput]     = useState('');

@@ -359,7 +359,9 @@ const CronicoTable: React.FC<{
 // ── Bloco por Família (modo gestor) ──────────────────────────────────────────
 
 type ItemSortMode = 'alfa' | 'ating-asc' | 'ating-desc' | 'direcao';
-type SortPillsComponent = React.FC<{ options: { key: string; label: string }[]; value: string; onChange: (v: any) => void }>;
+type FamSortMode = 'alfa' | 'ating-asc' | 'ating-desc' | 'alta' | 'baixa';
+type UnitSortMode = 'alfa' | 'count' | 'ating-asc';
+type SortPillsComponent = React.FC<{ options: { key: string; label: string }[]; value: string; onChange: (v: string) => void }>;
 
 const FamiliaBlock: React.FC<{
   familia:   string;
@@ -421,7 +423,7 @@ const FamiliaBlock: React.FC<{
         <>
           <div className="flex items-center gap-2 flex-wrap px-4 py-2 border-b border-slate-100 bg-white">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{sortLabel}</span>
-            <SortPills options={ITEM_SORT_OPTIONS} value={itemSortMode} onChange={setItemSortMode} />
+            <SortPills options={ITEM_SORT_OPTIONS} value={itemSortMode} onChange={(v) => setItemSortMode(v as ItemSortMode)} />
           </div>
           <CronicoTable items={sortedItems} onSelect={onSelect} />
         </>
@@ -493,7 +495,7 @@ const UnidadeBlock: React.FC<{
         <>
           <div className="flex items-center gap-2 flex-wrap px-4 py-2 border-b border-slate-100 bg-white">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{sortLabel}</span>
-            <SortPills options={ITEM_SORT_OPTIONS} value={itemSortMode} onChange={setItemSortMode} />
+            <SortPills options={ITEM_SORT_OPTIONS} value={itemSortMode} onChange={(v) => setItemSortMode(v as ItemSortMode)} />
           </div>
           <CronicoTable items={sortedItems} onSelect={onSelect} />
         </>
@@ -515,8 +517,8 @@ export const ProdutosCronicosSection: React.FC<ProdutosCronicosSectionProps> = (
   const [expandedFamilias, setExpandedFamilias] = useState<Set<string>>(new Set());
   const [filterText,       setFilterText]       = useState('');
   const [modalCronico,     setModalCronico]      = useState<ProdutoCronico | null>(null);
-  const [famSortMode,      setFamSortMode]       = useState<'alfa' | 'ating-asc' | 'ating-desc' | 'alta' | 'baixa'>('alfa');
-  const [unitSortMode,     setUnitSortMode]      = useState<'alfa' | 'count' | 'ating-asc'>('alfa');
+  const [famSortMode,      setFamSortMode]       = useState<FamSortMode>('alfa');
+  const [unitSortMode,     setUnitSortMode]      = useState<UnitSortMode>('alfa');
 
   const excShort = t('cronicos.excFctsShort');
   const defShort = t('cronicos.defFctsShort');
@@ -554,7 +556,7 @@ export const ProdutosCronicosSection: React.FC<ProdutosCronicosSectionProps> = (
   const SortPills = ({ options, value, onChange }: {
     options: { key: string; label: string }[];
     value: string;
-    onChange: (v: any) => void;
+    onChange: (v: string) => void;
   }) => (
     <div className="flex items-center gap-1 border border-slate-200 rounded-lg px-1.5 py-0.5 bg-white">
       <ArrowUpDown className="w-2.5 h-2.5 text-slate-400 shrink-0" />
@@ -676,7 +678,7 @@ export const ProdutosCronicosSection: React.FC<ProdutosCronicosSectionProps> = (
             <span className="text-blue-600 font-semibold">{cronicos.filter(c => c.direcao === 'baixa').length} {defShort}</span>
           </p>
           <div className="flex items-center gap-2 ml-auto flex-wrap">
-            <SortPills options={FAM_SORT_OPTIONS} value={famSortMode} onChange={setFamSortMode} />
+            <SortPills options={FAM_SORT_OPTIONS} value={famSortMode} onChange={(v) => setFamSortMode(v as FamSortMode)} />
             <button
               onClick={() => toggleAllFam(!allFamExpanded)}
               className="text-xs font-bold text-slate-500 hover:text-slate-700 border border-slate-200 hover:border-slate-300 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap flex items-center gap-1"
@@ -759,7 +761,7 @@ export const ProdutosCronicosSection: React.FC<ProdutosCronicosSectionProps> = (
           />
         )}
         <div className="flex items-center gap-2 flex-wrap">
-          <SortPills options={UNIT_SORT_OPTIONS} value={unitSortMode} onChange={setUnitSortMode} />
+          <SortPills options={UNIT_SORT_OPTIONS} value={unitSortMode} onChange={(v) => setUnitSortMode(v as UnitSortMode)} />
           <button
             onClick={() => toggleAll(!allExpanded)}
             className="text-xs font-bold text-slate-500 hover:text-slate-700 border border-slate-200 hover:border-slate-300 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap flex items-center gap-1"

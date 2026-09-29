@@ -84,10 +84,6 @@ export const InfoTooltip: React.FC<{
     compute(e.currentTarget as HTMLElement);
   }, [visible, compute]);
 
-  const arrowLeft = coords.left === VIEWPORT_MARGIN || coords.left >= window.innerWidth - tailwindWidthPx(width) - VIEWPORT_MARGIN
-    ? undefined
-    : '50%';
-
   const tooltip = visible ? createPortal(
     <div
       style={{

@@ -33,8 +33,8 @@ export const LoginPage: React.FC = () => {
     try {
       await login(email.trim(), password);
       navigate('/dashboard');
-    } catch (err: any) {
-      setError(err.message || t('errors.invalid'));
+    } catch (err) {
+      setError((err instanceof Error && err.message) || t('errors.invalid'));
     } finally {
       setLoading(false);
     }

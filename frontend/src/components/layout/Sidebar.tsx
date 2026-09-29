@@ -99,9 +99,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggle, mobileOpe
     const fetch_ = () =>
       fetch('/api/cycle-readiness', { headers: { Authorization: `Bearer ${token}` } })
         .then(r => r.ok ? r.json() : [])
-        .then((data: any[]) => {
+        .then((data: { gate: string; updatedAt: string }[]) => {
           const now = Date.now();
-          const stuck = data.some((c: any) =>
+          const stuck = data.some((c) =>
             ['PENDING', 'PARTIAL'].includes(c.gate) &&
             now - new Date(c.updatedAt).getTime() > 24 * 3_600_000
           );

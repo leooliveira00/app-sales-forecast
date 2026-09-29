@@ -32,6 +32,7 @@ export const EvolucaoMensalChart: React.FC<EvolucaoMensalChartProps> = ({ data, 
           style: { cursor: 'pointer' },
           // Recharts chama onClick como (props, event); props traz o ponto de dados em
           // .payload em runtime, mas o tipo DotProps da lib não declara esse campo.
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           onClick: (props: any) => {
             const m = props?.payload?.month;
             if (m) onPointClick(m);

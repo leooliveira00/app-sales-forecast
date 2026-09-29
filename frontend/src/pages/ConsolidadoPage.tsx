@@ -251,7 +251,6 @@ export const ConsolidadoPage: React.FC = () => {
   // "-leve" distingue do cache full (Fase 3 busca detalhe por unidade separadamente)
   const mainCacheKey  = `consolidado-main-leve|${startMonth}|${endMonth}`;
   const acurCacheKey  = `acuracia|${mesesCount}|${endMonth}`;
-  const cronCacheKey  = 'cronicos';
 
   // ── Estado: lê cache sincronamente na inicialização ───────────────────────
   const [data,     setData]     = useState<ConsolidadoData | null>(() =>
@@ -483,8 +482,7 @@ export const ConsolidadoPage: React.FC = () => {
     .slice(0, 5)
     .map(d => ({ ...d, name: d.name.length > 10 ? d.name.slice(0, 10) + '…' : d.name }));
 
-  const handleDivisionBarClick = useCallback((payload: any) => {
-    const codigo = payload?.codigo;
+  const handleDivisionBarClick = useCallback((codigo: string | undefined) => {
     if (!codigo) return;
     setExpandedUnit(codigo);
     setActiveTab('divisoes');
@@ -835,9 +833,9 @@ export const ConsolidadoPage: React.FC = () => {
                   {!isMobile && (
                     <Legend iconType="circle" wrapperStyle={{ paddingTop: '8px', fontSize: '11px', color: '#475569' }} />
                   )}
-                  <Bar dataKey="ORC"  name={tc('abbr.orc') as string}  fill="#94a3b8" radius={[0, 4, 4, 0]} barSize={isMobile ? 7 : 11} style={{ cursor: 'pointer' }} onClick={handleDivisionBarClick} />
-                  <Bar dataKey="FCTS" name={tc('abbr.fcts') as string} fill="#3b82f6" radius={[0, 4, 4, 0]} barSize={isMobile ? 7 : 11} style={{ cursor: 'pointer' }} onClick={handleDivisionBarClick} />
-                  <Bar dataKey="Vendas" fill="#0d9488" radius={[0, 4, 4, 0]} barSize={isMobile ? 7 : 11} style={{ cursor: 'pointer' }} onClick={handleDivisionBarClick} />
+                  <Bar dataKey="ORC"  name={tc('abbr.orc') as string}  fill="#94a3b8" radius={[0, 4, 4, 0]} barSize={isMobile ? 7 : 11} style={{ cursor: 'pointer' }} onClick={(bar) => handleDivisionBarClick(bar.payload?.codigo)} />
+                  <Bar dataKey="FCTS" name={tc('abbr.fcts') as string} fill="#3b82f6" radius={[0, 4, 4, 0]} barSize={isMobile ? 7 : 11} style={{ cursor: 'pointer' }} onClick={(bar) => handleDivisionBarClick(bar.payload?.codigo)} />
+                  <Bar dataKey="Vendas" fill="#0d9488" radius={[0, 4, 4, 0]} barSize={isMobile ? 7 : 11} style={{ cursor: 'pointer' }} onClick={(bar) => handleDivisionBarClick(bar.payload?.codigo)} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -1179,7 +1177,7 @@ export const ConsolidadoPage: React.FC = () => {
                           <button
                             onClick={() => {
                               setDrawerMesConsolidado(null);
-                              handleDivisionBarClick(u);
+                              handleDivisionBarClick(u.codigo);
                             }}
                             title={tc('viewDivisionFamilies')}
                             className="text-[9px] font-bold text-sky-600 hover:text-sky-800 bg-sky-50 hover:bg-sky-100 px-2 py-0.5 rounded-full border border-sky-200 transition-colors whitespace-nowrap"

@@ -64,8 +64,8 @@ const fmt = (v: number | null | undefined): string =>
   v != null ? new Intl.NumberFormat('pt-BR').format(v) : '—';
 
 export function useForecastActions({
-  unidade, cycleDate, activeRun, availableRuns, cycleParam,
-  windowMonths, targetIdx, token, isExport,
+  unidade, cycleDate, activeRun,
+  windowMonths, targetIdx, token,
   fcts, setFcts,
   initialFcts,
   items, setItems, cacheKey, itemCache, subCache,
@@ -270,7 +270,6 @@ export function useForecastActions({
     if (!unidade || !cacheKey) return;
     const active = familiaItems.filter(i => !i.gestorExcluido);
     if (active.length === 0) return;
-    const familyName = active[0].produto.descricao;
     if (!confirm(`Remover a família (${active.length} produto${active.length > 1 ? 's' : ''}) deste ciclo?`)) return;
 
     await Promise.allSettled(

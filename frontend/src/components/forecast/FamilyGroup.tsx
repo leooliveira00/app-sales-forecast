@@ -37,7 +37,7 @@ interface FamilyGroupProps {
 }
 
 export const FamilyGroup: React.FC<FamilyGroupProps> = ({
-  familia, items, isExport, unitPaises, isReadOnly, collapsed, onToggle,
+  familia, items, isExport, isReadOnly, collapsed, onToggle,
   fcts, setFcts, initialFcts, saveFCTS, savingId,
   onBulkApplyPercent, onBulkSetValue, onBulkCopyPrevious, hasPrevious,
   onExclude, onExcludeFamily, onRestore,
