@@ -6,6 +6,7 @@ import { appCache } from "../utils/cache.js";
 import * as SnapshotService from "./snapshot.service.js";
 import { createForRole, createForUser } from "./notification.service.js";
 import { logAudit } from "./audit.service.js";
+import { allowedFrom, assertTransition, rethrowIfStale } from "../utils/submission-workflow.js";
 
 async function getUserSnapshot(userId: string): Promise<{ nome: string | null; perfil: string | null }> {
   const u = await prisma.user.findUnique({
@@ -68,10 +69,11 @@ export const getOrCreate = async (
 export const submit = async (id: string, autorId: string) => {
   const userSnap = await getUserSnapshot(autorId);
   const previous = await prisma.divisionSubmission.findUnique({ where: { id }, select: { status: true } });
+  assertTransition(previous?.status, "submit");
 
   const result = await prisma.$transaction(async (tx) => {
     const updated = await tx.divisionSubmission.update({
-      where: { id },
+      where: { id, status: { in: allowedFrom("submit") } },
       data: { status: "SUBMITTED", submittedAt: new Date(), autoSubmitted: false },
       include: includeRelations,
     });
@@ -92,7 +94,7 @@ export const submit = async (id: string, autorId: string) => {
     });
 
     return updated;
-  });
+  }).catch(rethrowIfStale);
 
   appCache.invalidateConsolidado();
 
@@ -114,6 +116,7 @@ export const submit = async (id: string, autorId: string) => {
 export const approve = async (id: string, revisorId: string) => {
   const userSnap = await getUserSnapshot(revisorId);
   const previous = await prisma.divisionSubmission.findUnique({ where: { id }, select: { status: true, unidadeVendaId: true, refMonth: true } });
+  assertTransition(previous?.status, "approve");
 
   // Pre-fetch approved FCTS snapshot for audit (one record per product at approval time)
   type OverrideEntry = { produtoId: string; paisIso3: string | null; totalFCTS: number; itemCount: number };
@@ -143,7 +146,7 @@ export const approve = async (id: string, revisorId: string) => {
 
   const result = await prisma.$transaction(async (tx) => {
     const updated = await tx.divisionSubmission.update({
-      where: { id },
+      where: { id, status: { in: allowedFrom("approve") } },
       data: { status: "APPROVED", revisorId, reviewedAt: new Date(), rejectionReason: null },
       include: includeRelations,
     });
@@ -184,7 +187,7 @@ export const approve = async (id: string, revisorId: string) => {
     }
 
     return updated;
-  });
+  }).catch(rethrowIfStale);
 
   appCache.invalidateConsolidado();
   await advanceAwaitingCycles(result.refMonth);
@@ -212,10 +215,11 @@ export const approve = async (id: string, revisorId: string) => {
 export const reject = async (id: string, revisorId: string, reason: string) => {
   const userSnap = await getUserSnapshot(revisorId);
   const previous = await prisma.divisionSubmission.findUnique({ where: { id }, select: { status: true } });
+  assertTransition(previous?.status, "reject");
 
   const result = await prisma.$transaction(async (tx) => {
     const updated = await tx.divisionSubmission.update({
-      where: { id },
+      where: { id, status: { in: allowedFrom("reject") } },
       data: { status: "REJECTED", revisorId, reviewedAt: new Date(), rejectionReason: reason },
       include: includeRelations,
     });
@@ -236,7 +240,7 @@ export const reject = async (id: string, revisorId: string, reason: string) => {
     });
 
     return updated;
-  });
+  }).catch(rethrowIfStale);
 
   appCache.invalidateConsolidado();
   await advanceAwaitingCycles(result.refMonth);

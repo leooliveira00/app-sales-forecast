@@ -2,6 +2,7 @@ import { Response } from "express";
 import { AuthRequest } from "../middleware/auth.middleware.js";
 import * as SubmissionService from "../services/submission.service.js";
 import { assertCycleReady } from "../services/cycle-readiness.service.js";
+import { HttpError } from "../utils/http-error.js";
 import type {
   ListSubmissionsQuery,
   SubmissionByUnitQuery,
@@ -12,6 +13,12 @@ import type {
 /** Gestor só opera nas unidades vinculadas ao próprio usuário; os demais perfis veem todas. */
 const canAccessUnit = (req: AuthRequest, unidadeVendaId: string) =>
   req.user!.perfil !== "gestor" || req.user!.unidadeCodigos.includes(unidadeVendaId);
+
+/** Erros de regra de negócio (404/409 do workflow) seguem com seu status; o resto usa o fallback. */
+const sendError = (res: Response, err: unknown, fallbackStatus: number, fallbackMessage: string) =>
+  err instanceof HttpError
+    ? res.status(err.status).json({ error: err.message })
+    : res.status(fallbackStatus).json({ error: fallbackMessage });
 
 export const list = async (req: AuthRequest, res: Response) => {
   const { status, unidadeVendaId } = req.query as ListSubmissionsQuery;
@@ -73,15 +80,10 @@ export const submit = async (req: AuthRequest, res: Response) => {
   try {
     // Cria ou obtém o rascunho e submete
     const draft = await SubmissionService.getOrCreate(unidadeVendaId, refMonth, autorId);
-
-    if (draft.status === "APPROVED") {
-      return res.status(400).json({ error: "Submissão já está aprovada." });
-    }
-
     const submitted = await SubmissionService.submit(draft.id, autorId);
     res.json(submitted);
-  } catch {
-    res.status(400).json({ error: "Erro ao submeter forecast" });
+  } catch (err) {
+    sendError(res, err, 400, "Erro ao submeter forecast");
   }
 };
 
@@ -92,8 +94,8 @@ export const approve = async (req: AuthRequest, res: Response) => {
   try {
     const sub = await SubmissionService.approve(id, revisorId);
     res.json(sub);
-  } catch {
-    res.status(400).json({ error: "Erro ao aprovar submissão" });
+  } catch (err) {
+    sendError(res, err, 400, "Erro ao aprovar submissão");
   }
 };
 
@@ -105,8 +107,8 @@ export const reject = async (req: AuthRequest, res: Response) => {
   try {
     const sub = await SubmissionService.reject(id, revisorId, reason);
     res.json(sub);
-  } catch {
-    res.status(400).json({ error: "Erro ao rejeitar submissão" });
+  } catch (err) {
+    sendError(res, err, 400, "Erro ao rejeitar submissão");
   }
 };
 
