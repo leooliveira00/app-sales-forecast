@@ -9,6 +9,10 @@ import type {
   RejectBody,
 } from "../schemas/submission.schema.js";
 
+/** Gestor só opera nas unidades vinculadas ao próprio usuário; os demais perfis veem todas. */
+const canAccessUnit = (req: AuthRequest, unidadeVendaId: string) =>
+  req.user!.perfil !== "gestor" || req.user!.unidadeCodigos.includes(unidadeVendaId);
+
 export const list = async (req: AuthRequest, res: Response) => {
   const { status, unidadeVendaId } = req.query as ListSubmissionsQuery;
   const user = req.user!;
@@ -40,6 +44,10 @@ export const pendingCount = async (_req: AuthRequest, res: Response) => {
 export const getByUnitAndMonth = async (req: AuthRequest, res: Response) => {
   const { unidadeVendaId, month } = req.query as SubmissionByUnitQuery;
 
+  if (!canAccessUnit(req, unidadeVendaId)) {
+    return res.status(403).json({ error: "Acesso negado à unidade solicitada" });
+  }
+
   try {
     const sub = await SubmissionService.findByUnitAndMonth(unidadeVendaId, month);
     res.json(sub ?? null);
@@ -51,6 +59,10 @@ export const getByUnitAndMonth = async (req: AuthRequest, res: Response) => {
 export const submit = async (req: AuthRequest, res: Response) => {
   const { unidadeVendaId, refMonth } = req.body as SubmitBody;
   const autorId = req.user!.id;
+
+  if (!canAccessUnit(req, unidadeVendaId)) {
+    return res.status(403).json({ error: "Acesso negado à unidade solicitada" });
+  }
 
   // Gate check: block submission if cycle is not READY
   const gateCheck = await assertCycleReady(refMonth);
