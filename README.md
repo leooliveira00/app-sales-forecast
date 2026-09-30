@@ -213,4 +213,5 @@ por conveniência de UX.
 frontend/   React 19 + Vite (Tailwind v4, TanStack Query, react-router v7, i18next)
 backend/    Express + Prisma REST API
 dags/       DAGs do Airflow — não faz parte do build Node, roda em ambiente Python separado
+            (dependências fixadas em dags/requirements.txt, sobre a imagem apache/airflow:2.10.3)
 ```

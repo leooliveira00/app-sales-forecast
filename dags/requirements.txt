@@ -1,0 +1,22 @@
+# Dependências Python das DAGs, além do que a imagem oficial do Airflow já traz.
+#
+# Versões idênticas às instaladas no ambiente Airflow de produção
+# (apache-airflow==2.10.3). O próprio Airflow e seus providers NÃO entram aqui:
+# vêm da imagem apache/airflow:2.10.3, e reinstalá-los por pip quebraria as constraints.
+#
+# Instalação na imagem (Dockerfile estendendo apache/airflow:2.10.3):
+#   COPY dags/requirements.txt /requirements.txt
+#   RUN pip install --no-cache-dir -r /requirements.txt
+
+# ── Motor de forecast (protheus_forecast_run.py) ──────────────────────────────
+numpy==1.26.4
+pandas==2.1.4
+statsmodels==0.14.6        # Holt, Winters (ExponentialSmoothing), ARIMA
+pmdarima==2.1.1            # AutoARIMA
+statsforecast==1.7.8       # Theta, Croston
+
+# ── Dependências transitivas fixadas explicitamente ──────────────────────────
+# pmdarima é sensível à combinação scipy/scikit-learn; fixar evita que um
+# upgrade transitivo quebre o AutoARIMA silenciosamente.
+scipy==1.17.1
+scikit-learn==1.8.0
