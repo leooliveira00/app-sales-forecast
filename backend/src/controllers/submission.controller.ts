@@ -1,18 +1,20 @@
 import { Response } from "express";
-import { SubmissionStatus } from "@prisma/client";
 import { AuthRequest } from "../middleware/auth.middleware.js";
 import * as SubmissionService from "../services/submission.service.js";
 import { assertCycleReady } from "../services/cycle-readiness.service.js";
+import type {
+  ListSubmissionsQuery,
+  SubmissionByUnitQuery,
+  SubmitBody,
+  RejectBody,
+} from "../schemas/submission.schema.js";
 
 export const list = async (req: AuthRequest, res: Response) => {
-  const { status, unidadeVendaId } = req.query;
+  const { status, unidadeVendaId } = req.query as ListSubmissionsQuery;
   const user = req.user!;
 
   try {
-    const filters: { status?: SubmissionStatus; unidadeVendaId?: string; autorId?: string } = {};
-
-    if (status) filters.status = status as SubmissionStatus;
-    if (unidadeVendaId) filters.unidadeVendaId = unidadeVendaId as string;
+    const filters: ListSubmissionsQuery & { autorId?: string } = { status, unidadeVendaId };
 
     // Gestor só vê suas próprias submissões
     if (user.perfil === "gestor") {
@@ -36,17 +38,10 @@ export const pendingCount = async (_req: AuthRequest, res: Response) => {
 };
 
 export const getByUnitAndMonth = async (req: AuthRequest, res: Response) => {
-  const { unidadeVendaId, month } = req.query;
-
-  if (!unidadeVendaId || !month) {
-    return res.status(400).json({ error: "unidadeVendaId e month são obrigatórios" });
-  }
+  const { unidadeVendaId, month } = req.query as SubmissionByUnitQuery;
 
   try {
-    const sub = await SubmissionService.findByUnitAndMonth(
-      unidadeVendaId as string,
-      month as string
-    );
+    const sub = await SubmissionService.findByUnitAndMonth(unidadeVendaId, month);
     res.json(sub ?? null);
   } catch {
     res.status(500).json({ error: "Erro ao buscar submissão" });
@@ -54,12 +49,8 @@ export const getByUnitAndMonth = async (req: AuthRequest, res: Response) => {
 };
 
 export const submit = async (req: AuthRequest, res: Response) => {
-  const { unidadeVendaId, refMonth } = req.body;
+  const { unidadeVendaId, refMonth } = req.body as SubmitBody;
   const autorId = req.user!.id;
-
-  if (!unidadeVendaId || !refMonth) {
-    return res.status(400).json({ error: "unidadeVendaId e refMonth são obrigatórios" });
-  }
 
   // Gate check: block submission if cycle is not READY
   const gateCheck = await assertCycleReady(refMonth);
@@ -96,15 +87,11 @@ export const approve = async (req: AuthRequest, res: Response) => {
 
 export const reject = async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
-  const { reason } = req.body;
+  const { reason } = req.body as RejectBody;
   const revisorId = req.user!.id;
 
-  if (!reason?.trim()) {
-    return res.status(400).json({ error: "Motivo da rejeição é obrigatório" });
-  }
-
   try {
-    const sub = await SubmissionService.reject(id, revisorId, reason.trim());
+    const sub = await SubmissionService.reject(id, revisorId, reason);
     res.json(sub);
   } catch {
     res.status(400).json({ error: "Erro ao rejeitar submissão" });
