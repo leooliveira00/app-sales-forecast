@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import * as ForecastAirflowService from "../services/forecast-airflow.service.js";
+import type { AddForecastItemsBody, CreateForecastRunBody } from "../schemas/internal.schema.js";
 
 // ── GET /api/internal/forecast/sales-data ────────────────────────────────
 
@@ -30,26 +31,10 @@ export const getSalesData = async (req: Request, res: Response) => {
 // ── POST /api/internal/forecast/run ──────────────────────────────────────
 
 export const createRun = async (req: Request, res: Response) => {
-  const { refMonth, leadTimeMonths, triggeredBy } = req.body as {
-    refMonth:       unknown;
-    leadTimeMonths: unknown;
-    triggeredBy:    unknown;
-  };
-
-  if (typeof refMonth !== "string" || !refMonth.trim()) {
-    return res.status(400).json({ error: "Campo 'refMonth' é obrigatório (ex: '2026-03-01')." });
-  }
-
-  const lt = typeof leadTimeMonths === "number"
-    ? leadTimeMonths
-    : parseInt(String(leadTimeMonths ?? "2"), 10) || 2;
-
-  const source = typeof triggeredBy === "string" && triggeredBy.trim()
-    ? triggeredBy.trim()
-    : "airflow-scheduler";
+  const { refMonth, leadTimeMonths, triggeredBy } = req.body as CreateForecastRunBody;
 
   try {
-    const run = await ForecastAirflowService.createForecastRun(refMonth.trim(), lt, source);
+    const run = await ForecastAirflowService.createForecastRun(refMonth, leadTimeMonths, triggeredBy);
     return res.status(201).json({
       runId:       run.id,
       refMonth:    run.refMonth,
@@ -81,37 +66,10 @@ export const finalizeRun = async (req: Request, res: Response) => {
 
 export const addItems = async (req: Request, res: Response) => {
   const { runId } = req.params;
-  const { items } = req.body as { items: unknown };
-
-  if (!Array.isArray(items) || items.length === 0) {
-    return res.status(400).json({ error: "Campo 'items' deve ser um array não-vazio." });
-  }
-
-  // Valida cada item minimamente
-  for (const item of items) {
-    if (
-      typeof item !== "object" || item === null ||
-      typeof (item as Record<string, unknown>).produtoId      !== "string" ||
-      typeof (item as Record<string, unknown>).unidadeVendaId !== "string" ||
-      typeof (item as Record<string, unknown>).month          !== "string"
-    ) {
-      return res.status(400).json({
-        error: "Cada item deve conter produtoId (string), unidadeVendaId (string) e month (string).",
-      });
-    }
-  }
+  const { items } = req.body as AddForecastItemsBody;
 
   try {
-    const result = await ForecastAirflowService.addForecastItems(
-      runId,
-      items as Array<{
-        produtoId:      string;
-        unidadeVendaId: string;
-        month:          string;
-        volumeIA?:      number;
-        paisIso3?:      string | null;
-      }>
-    );
+    const result = await ForecastAirflowService.addForecastItems(runId, items);
     return res.status(201).json({ inserted: result.length });
   } catch (err) {
     console.error("[addItems]", err);

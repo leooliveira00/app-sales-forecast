@@ -3,14 +3,12 @@ import { markStep, getOrCreate, forceFailCycle } from "../services/cycle-readine
 import * as SnapshotService from "../services/snapshot.service.js";
 import { appCache } from "../utils/cache.js";
 import prisma from "../config/prisma.js";
+import type { AirflowCallbackBody, CycleFailedBody } from "../schemas/internal.schema.js";
 
 const MAX_AGE_MINUTES = 30;
 
 export const handleOrchestratorFailed = async (req: Request, res: Response) => {
-  const { refMonth } = req.body;
-  if (!refMonth) {
-    return res.status(400).json({ error: "refMonth is required" });
-  }
+  const { refMonth } = req.body as CycleFailedBody;
 
   try {
     await forceFailCycle(refMonth);
@@ -22,12 +20,7 @@ export const handleOrchestratorFailed = async (req: Request, res: Response) => {
 };
 
 export const handleCallback = async (req: Request, res: Response) => {
-  const { dag_id, dag_run_id, state, refMonth, issued_at, dataRefMonth } = req.body;
-
-  // Basic field validation
-  if (!dag_id || !dag_run_id || !state || !refMonth) {
-    return res.status(400).json({ error: "dag_id, dag_run_id, state and refMonth are required" });
-  }
+  const { dag_id, dag_run_id, state, refMonth, issued_at, dataRefMonth } = req.body as AirflowCallbackBody;
 
   // TTL check (replay protection)
   if (issued_at) {
@@ -59,9 +52,7 @@ export const handleCallback = async (req: Request, res: Response) => {
     // todos os lotes terem sido processados (substitui o disparo per-batch que
     // antes acontecia em vendas-sync.service.ts).
     if (dag_id === "protheus_vendas_sync" && state === "success") {
-      const yearSource = typeof dataRefMonth === "string" && dataRefMonth.trim()
-        ? dataRefMonth
-        : refMonth;
+      const yearSource = dataRefMonth?.trim() || refMonth;
       const affectedYear = new Date(yearSource).getUTCFullYear();
       appCache.invalidateAnalytics();
       void SnapshotService.refreshConsolidadoSnapshot(affectedYear)

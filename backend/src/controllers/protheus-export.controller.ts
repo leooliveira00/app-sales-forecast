@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { AuthRequest } from "../middleware/auth.middleware.js";
 import * as ProtheusExportService from "../services/protheus-export.service.js";
+import type { LogIdQuery } from "../schemas/internal.schema.js";
 
 // ── Rotas Admin ────────────────────────────────────────────────────────────────
 
@@ -156,11 +157,10 @@ export const cancelExport = async (req: AuthRequest, res: Response) => {
  * Dead-man's switch: a DAG consulta antes de cada unidade para saber se o export foi cancelado.
  */
 export const getLogStatus = async (req: Request, res: Response) => {
-  const { logId } = req.query;
-  if (!logId) return res.status(400).json({ error: "logId é obrigatório" });
+  const { logId } = req.query as LogIdQuery;
 
   try {
-    const status = await ProtheusExportService.getLogCurrentStatus(logId as string);
+    const status = await ProtheusExportService.getLogCurrentStatus(logId);
     if (status === null) return res.status(404).json({ error: "Log não encontrado" });
     return res.json({ status });
   } catch (err) {
@@ -174,11 +174,10 @@ export const getLogStatus = async (req: Request, res: Response) => {
  * Retorna os ProtheusExportItems PENDING para a DAG processar.
  */
 export const getExportData = async (req: Request, res: Response) => {
-  const { logId } = req.query;
-  if (!logId) return res.status(400).json({ error: "logId é obrigatório" });
+  const { logId } = req.query as LogIdQuery;
 
   try {
-    const data = await ProtheusExportService.getExportDataForDag(logId as string);
+    const data = await ProtheusExportService.getExportDataForDag(logId);
     return res.json(data);
   } catch (err) {
     console.error("[protheus-export] getExportData:", err);
@@ -192,9 +191,6 @@ export const getExportData = async (req: Request, res: Response) => {
  */
 export const reportDeleteStatus = async (req: Request, res: Response) => {
   const payload = req.body as ProtheusExportService.DeleteStatusPayload;
-  if (!payload?.logId || !payload?.unidadeVendaId || !payload?.status) {
-    return res.status(400).json({ error: "logId, unidadeVendaId e status são obrigatórios" });
-  }
   try {
     await ProtheusExportService.updateDeleteStatus(payload);
     return res.json({ ok: true });
@@ -210,9 +206,6 @@ export const reportDeleteStatus = async (req: Request, res: Response) => {
  */
 export const reportProgress = async (req: Request, res: Response) => {
   const payload = req.body as ProtheusExportService.ProgressPayload;
-  if (!payload?.logId || !payload?.unidadeVendaId || !payload?.month || !payload?.itemIds || !payload?.status) {
-    return res.status(400).json({ error: "Campos obrigatórios: logId, unidadeVendaId, month, itemIds, status" });
-  }
   try {
     await ProtheusExportService.updateProgress(payload);
     return res.json({ ok: true });
@@ -228,9 +221,6 @@ export const reportProgress = async (req: Request, res: Response) => {
  */
 export const finalize = async (req: Request, res: Response) => {
   const payload = req.body as ProtheusExportService.FinalizePayload;
-  if (!payload?.logId) {
-    return res.status(400).json({ error: "logId é obrigatório" });
-  }
   try {
     await ProtheusExportService.finalizeExport(payload);
     return res.json({ ok: true });

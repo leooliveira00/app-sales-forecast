@@ -1,46 +1,15 @@
 import { Request, Response } from "express";
 import { AuthRequest } from "../middleware/auth.middleware.js";
 import * as VendasSyncService from "../services/vendas-sync.service.js";
+import type { ReceiveVendasBody } from "../schemas/internal.schema.js";
 
 // ── Endpoint interno (chamado pelo Airflow) ───────────────────────────────────
 
 export const receiveVendas = async (req: Request, res: Response) => {
-  const { itens, refMonth, cDataDe, cDataAte, triggeredBy } = req.body as {
-    itens:       unknown;
-    refMonth:    unknown;
-    cDataDe:     unknown;
-    cDataAte:    unknown;
-    triggeredBy: unknown;
-  };
-
-  if (!Array.isArray(itens) || itens.length === 0) {
-    return res.status(400).json({ error: "Campo 'itens' deve ser um array não-vazio." });
-  }
-
-  if (typeof refMonth !== "string" || !refMonth.trim()) {
-    return res.status(400).json({ error: "Campo 'refMonth' é obrigatório (ex: '2026-02-01')." });
-  }
-
-  if (typeof cDataDe !== "string" || !cDataDe.trim()) {
-    return res.status(400).json({ error: "Campo 'cDataDe' é obrigatório." });
-  }
-
-  if (typeof cDataAte !== "string" || !cDataAte.trim()) {
-    return res.status(400).json({ error: "Campo 'cDataAte' é obrigatório." });
-  }
-
-  const source = typeof triggeredBy === "string" && triggeredBy.trim()
-    ? triggeredBy.trim()
-    : "airflow-scheduler";
+  const { itens, refMonth, cDataDe, cDataAte, triggeredBy } = req.body as ReceiveVendasBody;
 
   try {
-    const result = await VendasSyncService.syncVendas(
-      itens as VendasSyncService.VendaAgregadaItem[],
-      refMonth.trim(),
-      cDataDe.trim(),
-      cDataAte.trim(),
-      source,
-    );
+    const result = await VendasSyncService.syncVendas(itens, refMonth, cDataDe, cDataAte, triggeredBy);
     return res.status(201).json(result);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Erro interno no sync de vendas.";

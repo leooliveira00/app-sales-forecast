@@ -1,32 +1,15 @@
 import { Request, Response } from "express";
 import { AuthRequest } from "../middleware/auth.middleware.js";
 import * as ProtheusSyncService from "../services/protheus-sync.service.js";
+import type { ReceiveProdutosBody } from "../schemas/internal.schema.js";
 
 // ── Endpoint interno (chamado pelo Airflow) ───────────────────────────────────
 
 export const receiveProdutos = async (req: Request, res: Response) => {
-  const { itens, triggeredBy, cTipo } = req.body as {
-    itens:       unknown;
-    triggeredBy: unknown;
-    cTipo:       unknown;
-  };
-
-  if (!Array.isArray(itens) || itens.length === 0) {
-    return res.status(400).json({ error: "Campo 'itens' deve ser um array não-vazio." });
-  }
-
-  const source = typeof triggeredBy === "string" && triggeredBy.trim()
-    ? triggeredBy.trim()
-    : "airflow-scheduler";
-
-  const tipo = typeof cTipo === "string" && cTipo.trim() ? cTipo.trim() : "PA";
+  const { itens, triggeredBy, cTipo } = req.body as ReceiveProdutosBody;
 
   try {
-    const result = await ProtheusSyncService.upsertProdutos(
-      itens as ProtheusSyncService.ProtheusProductItem[],
-      source,
-      tipo
-    );
+    const result = await ProtheusSyncService.upsertProdutos(itens, triggeredBy, cTipo);
     return res.status(201).json(result);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Erro interno no upsert de produtos.";
