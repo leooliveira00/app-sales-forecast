@@ -1,6 +1,12 @@
 import { Response } from "express";
 import { AuthRequest } from "../middleware/auth.middleware.js";
 import * as CycleService from "../services/cycle-readiness.service.js";
+import type {
+  BlockCycleBody,
+  CloseCycleBody,
+  RerunCycleBody,
+  UnblockCycleBody,
+} from "../schemas/cycle.schema.js";
 
 export const list = async (req: AuthRequest, res: Response) => {
   const perfil = req.user!.perfil;
@@ -29,15 +35,11 @@ export const list = async (req: AuthRequest, res: Response) => {
 
 export const block = async (req: AuthRequest, res: Response) => {
   const { refMonth } = req.params;
-  const { reason }   = req.body;
+  const { reason }   = req.body as BlockCycleBody;
   const userId       = req.user!.id;
 
-  if (!reason?.trim()) {
-    return res.status(400).json({ error: "O motivo do bloqueio é obrigatório." });
-  }
-
   try {
-    const log = await CycleService.blockCycle(refMonth, userId, reason.trim());
+    const log = await CycleService.blockCycle(refMonth, userId, reason);
     res.json(log);
   } catch (err) {
     console.error("[cycle block]", err);
@@ -59,15 +61,11 @@ export const overview = async (req: AuthRequest, res: Response) => {
 
 export const close = async (req: AuthRequest, res: Response) => {
   const { refMonth } = req.params;
-  const { reason }   = req.body;
+  const { reason }   = req.body as CloseCycleBody;
   const userId       = req.user!.id;
 
-  if (!reason?.trim()) {
-    return res.status(400).json({ error: "O motivo do encerramento é obrigatório." });
-  }
-
   try {
-    await CycleService.closeCycle(refMonth, userId, reason.trim());
+    await CycleService.closeCycle(refMonth, userId, reason);
     res.json({ ok: true });
   } catch (err: unknown) {
     if ((err as { code?: string }).code === "SUBMITTED_OPEN") {
@@ -80,11 +78,11 @@ export const close = async (req: AuthRequest, res: Response) => {
 
 export const unblock = async (req: AuthRequest, res: Response) => {
   const { refMonth } = req.params;
-  const { note }     = req.body;
+  const { note }     = req.body as UnblockCycleBody;
   const userId       = req.user!.id;
 
   try {
-    const log = await CycleService.unblockCycle(refMonth, userId, note?.trim());
+    const log = await CycleService.unblockCycle(refMonth, userId, note);
     res.json(log);
   } catch (err) {
     console.error("[cycle unblock]", err);
@@ -94,18 +92,11 @@ export const unblock = async (req: AuthRequest, res: Response) => {
 
 export const rerun = async (req: AuthRequest, res: Response) => {
   const { refMonth }   = req.params;
-  const { dags, reason } = req.body;
+  const { dags, reason } = req.body as RerunCycleBody;
   const userId          = req.user!.id;
 
-  if (!Array.isArray(dags) || dags.length === 0) {
-    return res.status(400).json({ error: "Selecione ao menos uma DAG para re-executar." });
-  }
-  if (!reason?.trim()) {
-    return res.status(400).json({ error: "O motivo da re-execução é obrigatório." });
-  }
-
   try {
-    const log = await CycleService.rerunCycle(refMonth, userId, dags, reason.trim());
+    const log = await CycleService.rerunCycle(refMonth, userId, dags, reason);
     res.json(log);
   } catch (err) {
     console.error("[cycle rerun]", err);

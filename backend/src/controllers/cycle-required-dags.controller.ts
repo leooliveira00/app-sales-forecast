@@ -1,6 +1,7 @@
 import { Response } from "express";
 import { AuthRequest } from "../middleware/auth.middleware.js";
 import prisma from "../config/prisma.js";
+import type { CreateRequiredDagBody, UpdateRequiredDagBody } from "../schemas/cycle.schema.js";
 
 export const list = async (_req: AuthRequest, res: Response) => {
   try {
@@ -12,13 +13,10 @@ export const list = async (_req: AuthRequest, res: Response) => {
 };
 
 export const create = async (req: AuthRequest, res: Response) => {
-  const { dagId, label, enabled, order } = req.body;
-  if (!dagId?.trim() || !label?.trim()) {
-    return res.status(400).json({ error: "dagId e label são obrigatórios." });
-  }
+  const data = req.body as CreateRequiredDagBody;
   try {
     const dag = await prisma.cycleRequiredDag.create({
-      data: { dagId: dagId.trim(), label: label.trim(), enabled: enabled ?? true, order: order ?? 0 },
+      data,
     });
     res.status(201).json(dag);
   } catch {
@@ -28,7 +26,7 @@ export const create = async (req: AuthRequest, res: Response) => {
 
 export const update = async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
-  const { label, enabled, order } = req.body;
+  const { label, enabled, order } = req.body as UpdateRequiredDagBody;
   try {
     const dag = await prisma.cycleRequiredDag.update({
       where: { id },
