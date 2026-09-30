@@ -4,15 +4,9 @@ import * as SnapshotService from "../services/snapshot.service.js";
 import { appCache } from "../utils/cache.js";
 import prisma from "../config/prisma.js";
 
-const TOKEN = process.env.INTERNAL_SYNC_TOKEN ?? "";
 const MAX_AGE_MINUTES = 30;
 
 export const handleOrchestratorFailed = async (req: Request, res: Response) => {
-  const token = req.headers["authorization"]?.toString().replace("Bearer ", "");
-  if (!TOKEN || token !== TOKEN) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
-
   const { refMonth } = req.body;
   if (!refMonth) {
     return res.status(400).json({ error: "refMonth is required" });
@@ -28,12 +22,6 @@ export const handleOrchestratorFailed = async (req: Request, res: Response) => {
 };
 
 export const handleCallback = async (req: Request, res: Response) => {
-  // Token auth
-  const token = req.headers["authorization"]?.toString().replace("Bearer ", "");
-  if (!TOKEN || token !== TOKEN) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
-
   const { dag_id, dag_run_id, state, refMonth, issued_at, dataRefMonth } = req.body;
 
   // Basic field validation
