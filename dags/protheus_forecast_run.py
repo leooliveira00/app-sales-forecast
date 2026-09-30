@@ -245,6 +245,18 @@ def treinar_croston(treino: pd.Series, teste: pd.Series, dt_inicio: datetime) ->
         return None
 
 
+def selecionar_melhor_modelo(candidatos: List[Optional[Dict]]) -> Optional[Dict]:
+    """Escolhe o candidato de menor sMAPE, ignorando modelos que falharam (None).
+
+    Em empate, vence o primeiro da lista (ordem de `processar_grupo`).
+    Retorna None se nenhum modelo convergiu.
+    """
+    resultados = [c for c in candidatos if c is not None]
+    if not resultados:
+        return None
+    return min(resultados, key=lambda x: x["smape"])
+
+
 # ── Helpers HTTP ──────────────────────────────────────────────────────────────
 
 def _ssl_ctx() -> ssl.SSLContext:
@@ -295,12 +307,9 @@ def processar_grupo(args: tuple) -> Dict:
             treinar_theta(treino, teste, dt_inicio),
             treinar_croston(treino, teste, dt_inicio),
         ]
-        resultados = [c for c in candidatos if c is not None]
-
-        if not resultados:
+        melhor = selecionar_melhor_modelo(candidatos)
+        if melhor is None:
             return {**vazio, "falhados": 1}
-
-        melhor = min(resultados, key=lambda x: x["smape"])
 
         results = [
             {

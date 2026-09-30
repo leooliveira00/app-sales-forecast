@@ -16,3 +16,7 @@ dev.db
 *.dump
 *.mp4
 *.pdf
+
+# Python (DAGs)
+__pycache__/
+.pytest_cache/
