@@ -40,12 +40,25 @@ class TestCalcularSmape:
     def test_serie_toda_zerada_retorna_zero(self):
         assert fr.calcular_smape(np.zeros(12), np.zeros(12)) == 0.0
 
+    def test_previsao_toda_nan_nao_e_erro_zero(self):
+        # Regressão: NaN caía no ramo "série toda zerada" e retornava 0.0 (erro perfeito).
+        smape = fr.calcular_smape(np.array([10.0, 20.0, 30.0]), np.full(3, np.nan))
+        assert smape == float("inf")
+
+    def test_previsao_parcialmente_nan_nao_e_avaliada_so_nos_pontos_validos(self):
+        # Regressão: os pontos NaN eram descartados e o sMAPE saía só dos meses restantes.
+        smape = fr.calcular_smape(np.array([100.0, 50.0]), np.array([100.0, np.nan]))
+        assert smape == float("inf")
+
+    def test_previsao_infinita_nao_e_valida(self):
+        assert fr.calcular_smape(np.array([10.0]), np.array([np.inf])) == float("inf")
+
 
 # ── limpar_outliers ───────────────────────────────────────────────────────────
 
 class TestLimparOutliers:
-    # O critério de corte (média ± 1.5×IQR dos percentis 35–65) está em revisão;
-    # aqui só o que independe dele.
+    # O critério de corte (média ± 1.5×IQR dos percentis 35–65) é decisão de modelagem
+    # mantida como está; aqui só o que independe dele.
     def test_serie_constante_fica_inalterada(self):
         serie = pd.Series([42.0] * 12)
         assert fr.limpar_outliers(serie).tolist() == [42.0] * 12
@@ -90,6 +103,22 @@ class TestSelecionarMelhorModelo:
     def test_empate_mantem_a_ordem_dos_candidatos(self):
         melhor = fr.selecionar_melhor_modelo([_candidato("Holt", 10.0), _candidato("ARIMA(1,2,3)", 10.0)])
         assert melhor["modelo"] == "Holt"
+
+    @pytest.mark.parametrize("smape_invalido", [float("nan"), float("inf")])
+    def test_modelo_com_smape_nao_finito_nunca_vence(self, smape_invalido):
+        # Regressão: um modelo divergente (sMAPE NaN → 0.0) ganhava de um Theta com 8.0.
+        melhor = fr.selecionar_melhor_modelo([_candidato("Holt", smape_invalido), _candidato("Theta", 8.0)])
+        assert melhor["modelo"] == "Theta"
+
+    def test_modelo_com_previsao_futura_nan_e_descartado(self):
+        # Ajuste no teste ok, mas o refit na série completa divergiu: publicar NaN
+        # derrubaria o grupo inteiro em int(round(nan)).
+        divergente = {"modelo": "Holt", "smape": 5.0, "previsao": [("2026-09-01", np.nan)]}
+        melhor = fr.selecionar_melhor_modelo([divergente, _candidato("Theta", 8.0)])
+        assert melhor["modelo"] == "Theta"
+
+    def test_todos_invalidos_equivale_a_nenhum_convergir(self):
+        assert fr.selecionar_melhor_modelo([_candidato("Holt", float("nan"))]) is None
 
 
 # ── processar_grupo (orquestração, com modelos substituídos) ─────────────────

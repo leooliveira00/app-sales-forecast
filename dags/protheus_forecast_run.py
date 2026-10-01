@@ -77,7 +77,12 @@ logger = logging.getLogger(__name__)
 def calcular_smape(real: np.ndarray, previsto: np.ndarray) -> float:
     """sMAPE — Symmetric Mean Absolute Percentage Error (0–200%).
     Lida com zeros sem gerar infinito, adequado para demanda intermitente.
+
+    Previsão com NaN/inf (modelo divergiu) retorna inf: sem isso, os NaN eram
+    descartados pela máscara e um modelo divergente podia sair com erro 0.0.
     """
+    if not np.all(np.isfinite(previsto)):
+        return float("inf")
     denominador = (np.abs(real) + np.abs(previsto)) / 2
     mask = denominador > 0
     if mask.sum() == 0:
@@ -245,13 +250,21 @@ def treinar_croston(treino: pd.Series, teste: pd.Series, dt_inicio: datetime) ->
         return None
 
 
+def _candidato_valido(c: Optional[Dict]) -> bool:
+    """Modelo convergiu, com sMAPE finito e previsão futura sem NaN/inf."""
+    if c is None or not np.isfinite(c["smape"]):
+        return False
+    return all(np.isfinite(float(valor)) for _, valor in c["previsao"])
+
+
 def selecionar_melhor_modelo(candidatos: List[Optional[Dict]]) -> Optional[Dict]:
-    """Escolhe o candidato de menor sMAPE, ignorando modelos que falharam (None).
+    """Escolhe o candidato de menor sMAPE, ignorando modelos que falharam (None)
+    ou divergiram (sMAPE ou previsão não-finitos).
 
     Em empate, vence o primeiro da lista (ordem de `processar_grupo`).
-    Retorna None se nenhum modelo convergiu.
+    Retorna None se nenhum modelo válido.
     """
-    resultados = [c for c in candidatos if c is not None]
+    resultados = [c for c in candidatos if _candidato_valido(c)]
     if not resultados:
         return None
     return min(resultados, key=lambda x: x["smape"])
