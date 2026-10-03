@@ -15,7 +15,7 @@
  */
 
 import prisma from "../config/prisma.js";
-import { getAcuraciaUnidades } from "./forecast.service.js";
+import { getAcuraciaUnidades } from "./forecast-accuracy.service.js";
 import { winningRunByUnitMonth, type ForecastRunMeta } from "../utils/forecast-cycle.js";
 
 /** Snapshots com computedAt mais antigo que este valor são considerados stale. */
