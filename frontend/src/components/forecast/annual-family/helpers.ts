@@ -2,7 +2,7 @@
  * Constantes, tipos de ordenação e auxiliares de apresentação das linhas anuais por família.
  */
 import type { ForecastItem } from '../../../types/forecast';
-import type { AnnualProduct } from '../../../hooks/useAnnualForecastData';
+import type { AnnualProduct, DistributeCriterion } from '../../../hooks/useAnnualForecastData';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -45,3 +45,12 @@ export function adaptToItem(prod: AnnualProduct): ForecastItem {
     overrides: [],
   } as unknown as ForecastItem;
 }
+
+/** Chaves i18n dos critérios de distribuição/média das ações em lote. */
+export const CRITERIA_LABELS_KEYS: Record<DistributeCriterion, string> = {
+  trim: 'columns.trim',
+  sem:  'columns.sem',
+  '12m':'columns.avg12m',
+  orc:  'columns.orc',
+  aa:   'columns.yoy',
+};
