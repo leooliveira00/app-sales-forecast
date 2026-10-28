@@ -3,11 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useFormatter } from '../hooks/useFormatter';
 import { useConsolidadoCache } from '../context/ConsolidadoCacheContext';
-import {
-  Package, CheckCircle2,
-  Clock, AlertCircle, Loader2, AlertTriangle, Target,
-  TrendingDown, TrendingUp, Bug, ChevronRight, ChevronDown, ChevronUp, RefreshCw,
-} from 'lucide-react';
+import { Package, CheckCircle2, Clock, AlertCircle, Loader2, AlertTriangle, Target, TrendingDown, TrendingUp, Bug, ChevronRight, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../components/shared/ToastNotification';
 import { cn, InfoTooltip } from '../components/shared/Common';
@@ -15,90 +11,7 @@ import { Drawer } from '../components/shared/Drawer';
 import { TendenciaChart } from '../components/dashboard/TendenciaChart';
 import { PendentesDrawer } from '../components/dashboard/PendentesDrawer';
 import { useIsMobile } from '../hooks/useBreakpoint';
-
-// ── Tipos ─────────────────────────────────────────────────────────────────────
-
-interface DashSummary {
-  run: { id: string; executedAt: string } | null;
-  totalORC: number;
-  totalFCTS: number;
-  totalItems: number;
-  filledItems: number;
-  totalUnidadesAtivas: number;
-}
-
-interface Submission {
-  id: string;
-  status: 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED';
-  unidadeVenda: { codigo: string; descricao: string };
-  autor: { nome: string };
-  refMonth: string;
-  submittedAt: string | null;
-  rejectionReason?: string | null;
-}
-
-interface TendenciaPoint {
-  month: string;
-  orc: number;
-  fcts: number;
-  vendas: number;
-}
-
-interface DesvioSku {
-  codigo: string;
-  descricao: string;
-  volumeFCTS: number;
-  volumeVendaAA: number;
-  desvio: number;
-}
-
-interface DesviosCriticos {
-  skusComDesvio: number;
-  familias: string[];
-  threshold: number;
-  detalhe: { familia: string; skus: DesvioSku[] }[];
-}
-
-interface ProdutoCronico {
-  unidadeVendaId: string;
-  produtoCodigo: string;
-  produtoDescricao: string;
-  classe: string | null;
-  familia: string | null;
-  direcao: 'alta' | 'baixa';
-  desvioMedio: number;
-}
-
-interface AcuraciaUnidade {
-  codigo: string;
-  descricao: string;
-  acuracia: number;
-  bias: number;
-  ciclosValidos: number;
-  totalVendas: number;
-}
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-const toMonthParam = (d: Date) =>
-  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`;
-
-const STATUS_CLS: Record<string, { cls: string; dot: string }> = {
-  APPROVED:  { cls: 'bg-emerald-50 text-emerald-700 border-emerald-200', dot: 'bg-emerald-500' },
-  SUBMITTED: { cls: 'bg-amber-50   text-amber-700  border-amber-200',   dot: 'bg-amber-500'   },
-  REJECTED:  { cls: 'bg-red-50     text-red-700    border-red-200',     dot: 'bg-red-500'     },
-  DRAFT:     { cls: 'bg-slate-100  text-slate-500  border-slate-200',   dot: 'bg-slate-400'   },
-};
-
-type DashCacheShape = {
-  summary:             DashSummary | null;
-  submissions:         Submission[];
-  tendencia:           TendenciaPoint[];
-  desvios:             DesviosCriticos | null;
-  cronicos:            ProdutoCronico[];
-  acuraciaUnidades:    AcuraciaUnidade[];
-  acuraciaGestorSnap:  AcuraciaUnidade | null;
-};
+import { DashSummary, Submission, TendenciaPoint, DesviosCriticos, ProdutoCronico, AcuraciaUnidade, toMonthParam, STATUS_CLS, DashCacheShape } from './dashboard/types';
 
 // ── Componente principal ──────────────────────────────────────────────────────
 
