@@ -1,16 +1,18 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useFormatter } from '../hooks/useFormatter';
-import { Package, CheckCircle2, Clock, AlertCircle, Loader2, AlertTriangle, Target, TrendingDown, TrendingUp, Bug, ChevronRight, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
+import { Package, CheckCircle2, Clock, AlertCircle, Loader2, AlertTriangle, Target, TrendingDown, TrendingUp, Bug, RefreshCw } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { cn, InfoTooltip } from '../components/shared/Common';
-import { Drawer } from '../components/shared/Drawer';
 import { TendenciaChart } from '../components/dashboard/TendenciaChart';
 import { PendentesDrawer } from '../components/dashboard/PendentesDrawer';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { TendenciaPoint, ProdutoCronico, toMonthParam, STATUS_CLS } from './dashboard/types';
 import { useDashboardData } from './dashboard/useDashboardData';
+import { UnidadesSemSubmissaoDrawer } from './dashboard/UnidadesSemSubmissaoDrawer';
+import { DesviosCriticosDrawer } from './dashboard/DesviosCriticosDrawer';
+import { MesDetalheDrawer } from './dashboard/MesDetalheDrawer';
 
 // ── Componente principal ──────────────────────────────────────────────────────
 
@@ -18,7 +20,7 @@ export const DashboardPage: React.FC = () => {
   const { token, user, activeUnidade } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation(['dashboard', 'common']);
-  const { fmt, fmtDate } = useFormatter();
+  const { fmtDate } = useFormatter();
   const MESES = t('months', { ns: 'common', returnObjects: true }) as string[];
 
   const isGestor = user?.perfil === 'gestor';
@@ -39,24 +41,11 @@ export const DashboardPage: React.FC = () => {
 
   // ── Drawers ────────────────────────────────────────────────────────────────
   const [showDesviosDrawer, setShowDesviosDrawer] = useState(false);
-  const [expandedDesvioFamilies, setExpandedDesvioFamilies] = useState<Set<string>>(new Set());
   const [drawerMes, setDrawerMes] = useState<(TendenciaPoint & { desvio: number }) | null>(null);
   const [showUnidadesDrawer, setShowUnidadesDrawer] = useState(false);
-  const [allUnidades, setAllUnidades] = useState<{ codigo: string; descricao: string }[]>([]);
-  const [loadingUnidades, setLoadingUnidades] = useState(false);
 
   // Drawer: Produtos pendentes (detalhe do card "Produtos Preenchidos")
   const [showPendentesDrawer, setShowPendentesDrawer] = useState(false);
-
-  useEffect(() => {
-    if (!showUnidadesDrawer || allUnidades.length > 0 || loadingUnidades) return;
-    setLoadingUnidades(true);
-    fetch('/api/unidades', { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => r.ok ? r.json() : [])
-      .then((data: { codigo: string; descricao: string }[]) => setAllUnidades(data))
-      .catch(() => {})
-      .finally(() => setLoadingUnidades(false));
-  }, [showUnidadesDrawer, allUnidades.length, loadingUnidades, token]);
 
   // ── Métricas derivadas ─────────────────────────────────────────────────────
 
@@ -820,178 +809,23 @@ export const DashboardPage: React.FC = () => {
       )}
 
       {/* ── Drawer: Unidades sem Submissão ───────────────────────────────── */}
-      <Drawer
+      <UnidadesSemSubmissaoDrawer
         isOpen={showUnidadesDrawer}
         onClose={() => setShowUnidadesDrawer(false)}
-        title={t('cards.unitsWithoutSubmission')}
-        subtitle={`Ciclo ${MESES[currentMonth]}/${refDate.getFullYear()} · ${unidadesSemSubmissao ?? 0} pendente${unidadesSemSubmissao !== 1 ? 's' : ''}`}
-      >
-        {loadingUnidades ? (
-          <div className="flex justify-center py-10">
-            <Loader2 className="w-6 h-6 animate-spin text-slate-300" />
-          </div>
-        ) : (() => {
-          const pendingUnidades = allUnidades.filter(u => !unidadesNoMes.has(u.codigo));
-          const submittedUnidades = allUnidades.filter(u => unidadesNoMes.has(u.codigo));
-          return (
-            <div className="space-y-5">
-              {pendingUnidades.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-10 text-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center">
-                    <CheckCircle2 className="w-6 h-6 text-emerald-500" />
-                  </div>
-                  <p className="text-sm font-semibold text-emerald-700">{t('labels.allUnitsSubmitted')}</p>
-                  <p className="text-xs text-slate-400">{t('labels.noPendingUnits')}</p>
-                </div>
-              ) : (
-                <>
-                  <div className="space-y-2">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('labels.pending')}</p>
-                    {pendingUnidades.map(u => (
-                      <div key={u.codigo} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-amber-50 border border-amber-100">
-                        <div className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-bold text-slate-700">{u.descricao}</p>
-                          <p className="text-[10px] text-slate-400 font-mono">{u.codigo}</p>
-                        </div>
-                        <span className="text-[9px] font-bold bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full shrink-0">
-                          {t('labels.waiting')}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                  {submittedUnidades.length > 0 && (
-                    <div className="space-y-2">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('labels.submitted')}</p>
-                      {submittedUnidades.map(u => (
-                        <div key={u.codigo} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-100">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-bold text-slate-700">{u.descricao}</p>
-                            <p className="text-[10px] text-slate-400 font-mono">{u.codigo}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  <div className="pt-2 border-t border-slate-100">
-                    <button
-                      onClick={() => { setShowUnidadesDrawer(false); navigate('/aprovacoes'); }}
-                      className="w-full flex items-center justify-center gap-2 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold rounded-xl transition-colors"
-                    >
-                      {t('actions.goToApprovals')} <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          );
-        })()}
-      </Drawer>
+        token={token}
+        unidadesNoMes={unidadesNoMes}
+        cicloLabel={`${MESES[currentMonth]}/${refDate.getFullYear()}`}
+        pendentesCount={unidadesSemSubmissao}
+        onGoToApprovals={() => { setShowUnidadesDrawer(false); navigate('/aprovacoes'); }}
+      />
 
       {/* ── Drawer: Desvios Críticos ─────────────────────────────────────── */}
-      <Drawer
+      <DesviosCriticosDrawer
         isOpen={showDesviosDrawer}
         onClose={() => setShowDesviosDrawer(false)}
-        title={t('cards.criticalDeviations')}
-        subtitle={desvios
-          ? desvios.skusComDesvio > 0
-            ? t('drawer.skusAboveThreshold', { count: desvios.skusComDesvio, threshold: desvios.threshold })
-            : t('labels.currentCycle')
-          : undefined}
-      >
-        {desvios && (
-          desvios.skusComDesvio === 0 ? (
-            <div className="flex flex-col items-center justify-center py-10 text-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center">
-                <CheckCircle2 className="w-6 h-6 text-emerald-500" />
-              </div>
-              <p className="text-sm font-semibold text-emerald-700">{t('labels.noDeviations')}</p>
-              <p className="text-xs text-slate-400">{t('drawer.allWithinLimit', { threshold: desvios.threshold })}</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <p className="text-xs text-slate-500">
-                {t('drawer.deviationDescription', { threshold: desvios.threshold })}
-              </p>
-
-              {desvios.detalhe.map(({ familia, skus }) => {
-                const isExpanded = expandedDesvioFamilies.has(familia);
-                const maxDesvio = Math.max(...skus.map(s => Math.abs(s.desvio)));
-                return (
-                  <div key={familia} className="rounded-xl border border-slate-100 overflow-hidden">
-                    <button
-                      onClick={() => setExpandedDesvioFamilies(prev => {
-                        const next = new Set(prev);
-                        next.has(familia) ? next.delete(familia) : next.add(familia);
-                        return next;
-                      })}
-                      className="w-full flex items-center gap-2 px-4 py-2.5 bg-amber-50 hover:bg-amber-100 transition-colors text-left"
-                    >
-                      {isExpanded
-                        ? <ChevronUp className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                        : <ChevronDown className="w-3.5 h-3.5 text-amber-600 shrink-0" />}
-                      <span className="text-xs font-bold text-slate-700 flex-1">{familia}</span>
-                      <span className="text-[10px] font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full">
-                        {skus.length} SKU{skus.length !== 1 ? 's' : ''}
-                      </span>
-                      <span className={cn(
-                        'text-[10px] font-bold px-2 py-0.5 rounded-full',
-                        maxDesvio > 30 ? 'bg-red-100 text-red-700' : 'bg-orange-50 text-orange-700'
-                      )}>
-                        {t('drawer.maxDeviation', { value: maxDesvio.toFixed(0) })}
-                      </span>
-                    </button>
-                    {isExpanded && (
-                      <div className="divide-y divide-slate-50">
-                        {skus.map((sku) => {
-                          const fmtV = fmt;
-                          const isAlta = sku.desvio > 0;
-                          return (
-                            <div key={sku.codigo} className="px-4 py-3 space-y-1.5">
-                              <div className="flex items-start justify-between gap-2">
-                                <div>
-                                  <p className="text-xs font-bold text-slate-700 font-mono">{sku.codigo}</p>
-                                  <p className="text-[11px] text-slate-500 truncate max-w-[220px]">{sku.descricao}</p>
-                                </div>
-                                <span className={cn(
-                                  'text-xs font-bold px-2 py-0.5 rounded-full shrink-0',
-                                  isAlta ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-blue-600'
-                                )}>
-                                  {sku.desvio > 0 ? '+' : ''}{sku.desvio.toFixed(1)}%
-                                </span>
-                              </div>
-                              <div className="grid grid-cols-2 gap-2 text-[11px]">
-                                <div className="bg-slate-50 rounded-lg px-2.5 py-1.5">
-                                  <p className="text-slate-400 text-[9px] font-bold uppercase mb-0.5">{t('legend.vendaAA')}</p>
-                                  <p className="font-bold text-slate-600 tabular-nums">{fmtV(sku.volumeVendaAA)}</p>
-                                </div>
-                                <div className="bg-blue-50 rounded-lg px-2.5 py-1.5">
-                                  <p className="text-blue-400 text-[9px] font-bold uppercase mb-0.5">{t('legend.fcts')}</p>
-                                  <p className="font-bold text-blue-700 tabular-nums">{fmtV(sku.volumeFCTS)}</p>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-
-              <div className="pt-2 border-t border-slate-100 hidden md:block">
-                <button
-                  onClick={() => { setShowDesviosDrawer(false); navigate('/meu-forecast'); }}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold rounded-xl transition-colors"
-                >
-                  {t('actions.goToForecast')} <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          )
-        )}
-      </Drawer>
+        desvios={desvios}
+        onGoToForecast={() => { setShowDesviosDrawer(false); navigate('/meu-forecast'); }}
+      />
 
       {/* ── Drawer: Produtos Pendentes ───────────────────────────────────── */}
       <PendentesDrawer
@@ -1003,67 +837,11 @@ export const DashboardPage: React.FC = () => {
       />
 
       {/* ── Drawer: Detalhe do mês (TendenciaChart) ─────────────────────── */}
-      <Drawer
-        isOpen={!!drawerMes}
+      <MesDetalheDrawer
+        mes={drawerMes}
         onClose={() => setDrawerMes(null)}
-        title={drawerMes ? (() => { const [y, m] = drawerMes.month.split('-').map(Number); return `${MESES[m-1]}/${String(y).slice(2)}`; })() : ''}
-        subtitle={t('legend.subtitle')}
-      >
-        {drawerMes && (() => {
-          const d = drawerMes.desvio;
-          const desvioColor = Math.abs(d) <= 10 ? 'text-emerald-600' : Math.abs(d) <= 20 ? 'text-amber-600' : 'text-red-600';
-          const desvioKey = Math.abs(d) <= 10 ? 'ok' : Math.abs(d) <= 20 ? 'warning' : 'critical';
-          const desvioLabel = t(`labels.deviation.${desvioKey}`);
-          return (
-            <div className="space-y-4">
-              <div className={cn('flex items-center justify-between px-4 py-3 rounded-xl border', Math.abs(d) <= 10 ? 'bg-emerald-50 border-emerald-100' : Math.abs(d) <= 20 ? 'bg-amber-50 border-amber-100' : 'bg-red-50 border-red-100')}>
-                <span className="text-sm font-medium text-slate-600">{t('drawer.fctsVsSale')}</span>
-                <div className="text-right">
-                  <p className={cn('text-xl font-bold', desvioColor)}>
-                    {d >= 0 ? '+' : ''}{d.toFixed(1)}%
-                  </p>
-                  <p className={cn('text-[10px] font-bold', desvioColor)}>{desvioLabel}</p>
-                </div>
-              </div>
-              <div className="space-y-3">
-                {[
-                  { label: t('legend.orc'),   value: drawerMes.orc,   color: 'text-slate-500', bg: 'bg-slate-50 border-slate-100' },
-                  { label: t('legend.fcts'),  value: drawerMes.fcts,  color: 'text-blue-600',  bg: 'bg-blue-50 border-blue-100' },
-                  { label: t('legend.vendas'), value: drawerMes.vendas, color: 'text-teal-600', bg: 'bg-teal-50 border-teal-100' },
-                ].map(({ label, value, color, bg }) => (
-                  <div key={label} className={cn('flex items-center justify-between px-4 py-3 rounded-xl border', bg)}>
-                    <span className="text-sm font-medium text-slate-600">{label}</span>
-                    <span className={cn('text-base font-bold tabular-nums', color)}>{fmt(value)}</span>
-                  </div>
-                ))}
-              </div>
-              {drawerMes.orc > 0 && (
-                <div className="px-4 py-3 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
-                  <p className="text-xs text-slate-500 font-medium">{t('drawer.achievementVsORC')}</p>
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-blue-500 rounded-full"
-                        style={{ width: `${Math.min((drawerMes.fcts / drawerMes.orc) * 100, 100)}%` }}
-                      />
-                    </div>
-                    <span className="text-xs font-bold text-slate-700 tabular-nums">
-                      {((drawerMes.fcts / drawerMes.orc) * 100).toFixed(1)}%
-                    </span>
-                  </div>
-                </div>
-              )}
-              <button
-                onClick={() => { setDrawerMes(null); navigate('/consolidado'); }}
-                className="w-full mt-2 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors"
-              >
-                {t('drawer.viewConsolidado')}
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          );
-        })()}
-      </Drawer>
+        onViewConsolidado={() => { setDrawerMes(null); navigate('/consolidado'); }}
+      />
     </div>
   );
 };
