@@ -1,5 +1,7 @@
 # Sales Forecast Web
 
+[![CI](https://github.com/leooliveira00/app-sales-forecast/actions/workflows/ci.yml/badge.svg)](https://github.com/leooliveira00/app-sales-forecast/actions/workflows/ci.yml)
+
 Plataforma full-stack de **gestão de forecast de vendas**, construída para substituir
 o processo manual em planilhas por um fluxo colaborativo com aprovação e previsão
 assistida por IA.
@@ -28,9 +30,10 @@ um fluxo único com estado, papéis e trilha de auditoria:
 
 - **Fluxo de aprovação por ciclo** — rascunho → submissão → aprovação/rejeição,
   por unidade de venda e mês de referência, com motivo de rejeição registrado.
-- **Forecast assistido por IA** — motor batch (Airflow + Python) que testa 6
-  modelos de série temporal por produto/unidade (Holt, ARIMA, AutoARIMA, Winters,
-  Theta, Croston) e seleciona o de menor erro (sMAPE).
+- **Forecast assistido por IA** — motor batch (Airflow + Python) que treina
+  modelos de série temporal candidatos por produto/unidade (Holt, ARIMA, AutoARIMA,
+  Winters, Theta, Croston) e seleciona o de menor erro (sMAPE) num período de
+  validação. Veja [Limitações conhecidas](#limitações-conhecidas).
 - **Multi-run com janela editável** — cada execução de forecast cobre uma janela
   de meses; quando janelas de execuções diferentes se sobrepõem, o sistema resolve
   automaticamente qual delas "vence" para cada mês.
@@ -149,7 +152,7 @@ Acesse em **http://localhost:8080**.
 
 ## Desenvolvimento local (sem Docker)
 
-Útil para iterar rápido no código. Requer Node.js 18+ e um PostgreSQL acessível
+Útil para iterar rápido no código. Requer Node.js 20+ e um PostgreSQL acessível
 (o do `docker compose up postgres` funciona). Scripts locais usam `backend/.env`
 (separado do `.env` da raiz, lido apenas pelo Docker Compose).
 
@@ -172,8 +175,48 @@ npm install
 npm run dev                 # Vite em http://localhost:5173 (proxy /api e /uploads → :3000)
 ```
 
-Comandos úteis adicionais (Prisma Studio, backfill, export de dados de seed entre
-ambientes, etc.) estão documentados em [CLAUDE.md](CLAUDE.md).
+Outros scripts do backend (Prisma Studio, backfill de execuções históricas, export/import
+de dados de seed entre ambientes) estão listados em [backend/package.json](backend/package.json).
+
+## Qualidade e testes
+
+Pushes em `main`/`develop` e pull requests passam pelo [pipeline de CI](.github/workflows/ci.yml), com três jobs:
+
+| Pacote | Verificações | Rodar localmente |
+|---|---|---|
+| `backend/` | ESLint, `tsc` (strict), testes unitários (Vitest) | `npm run lint && npm run typecheck && npm test` |
+| `frontend/` | ESLint, `tsc` (strict), build de produção | `npm run lint && npm run typecheck && npm run build` |
+| `dags/` | testes do motor de forecast (pytest), sem precisar do Airflow instalado | `pip install -r requirements-dev.txt && python -m pytest` |
+
+Os testes cobrem a lógica de domínio mais sensível sem depender de banco: a seleção
+do forecast vencedor por mês, a máquina de estados da submissão (todas as combinações
+status × ação), o fuso de negócio dos ciclos, a validação de payloads (incluindo o
+contrato com os payloads reais enviados pelas DAGs) e o cálculo de sMAPE e seleção
+de modelo no motor de forecast.
+
+As rotas de submissão e de controle de ciclo, e todas as rotas internas chamadas pelo
+Airflow, validam o payload com [zod](https://zod.dev) antes de chegar aos controllers;
+erros seguem um formato único (`{ error }`) via middleware centralizado.
+
+## Limitações conhecidas
+
+- **Modelos de forecast inativos** — com as versões de bibliotecas fixadas em
+  `dags/requirements.txt`, quatro dos seis modelos candidatos (Holt, ARIMA, Winters e
+  Theta) falham na chamada e são descartados pela seleção; hoje apenas AutoARIMA e
+  Croston competem. A correção é pequena (parâmetros incompatíveis com a API atual do
+  statsmodels e nome de coluna do statsforecast), mas altera os números de forecast
+  gerados, então será feita com uma comparação antes/depois sobre dados reais.
+- **Testes sem banco** — a suíte cobre lógica pura; os fluxos que passam pelo Prisma
+  ainda são validados manualmente contra a API.
+- **Validação de payload parcial** — as demais rotas da UI (forecast, orçamento,
+  usuários) ainda validam a entrada manualmente nos controllers.
+
+## Sobre o histórico do Git
+
+O histórico de desenvolvimento anterior à publicação foi consolidado no commit inicial,
+durante a anonimização do projeto. Os commits seguintes registram a evolução feita já
+neste repositório público: validação de payloads, correções de autorização, testes
+automatizados, CI e refatoração dos módulos maiores.
 
 ## Perfis de acesso
 
