@@ -20,3 +20,9 @@ statsforecast==1.7.8       # Theta, Croston
 # upgrade transitivo quebre o AutoARIMA silenciosamente.
 scipy==1.17.1
 scikit-learn==1.8.0
+
+# statsforecast → fugue → pyarrow. O pyarrow 26 exige NumPy 2 em tempo de import, mas
+# não declara isso nos metadados — o pip o instala junto com numpy==1.26.4 e o motor
+# de forecast quebra ao importar. 25.0.1 validado com numpy 1.26.4 (CI + testes);
+# a versão do ambiente Airflow de produção ainda não foi conferida.
+pyarrow==25.0.1
