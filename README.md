@@ -51,10 +51,9 @@ um fluxo único com estado, papéis e trilha de auditoria:
 
 - **Fluxo de aprovação por ciclo** — rascunho → submissão → aprovação/rejeição,
   por unidade de venda e mês de referência, com motivo de rejeição registrado.
-- **Forecast assistido por IA** — motor batch (Airflow + Python) que treina
-  modelos de série temporal candidatos por produto/unidade (Holt, ARIMA, AutoARIMA,
-  Winters, Theta, Croston) e seleciona o de menor erro (sMAPE) num período de
-  validação. Veja [Limitações conhecidas](#limitações-conhecidas).
+- **Forecast assistido por IA** — motor batch (Airflow + Python) que treina 6
+  modelos de série temporal por produto/unidade (Holt, ARIMA, AutoARIMA, Winters,
+  Theta, Croston) e seleciona o de menor erro (sMAPE) num período de validação.
 - **Multi-run com janela editável** — cada execução de forecast cobre uma janela
   de meses; quando janelas de execuções diferentes se sobrepõem, o sistema resolve
   automaticamente qual delas "vence" para cada mês.
@@ -221,12 +220,6 @@ erros seguem um formato único (`{ error }`) via middleware centralizado.
 
 ## Limitações conhecidas
 
-- **Modelos de forecast inativos** — com as versões de bibliotecas fixadas em
-  `dags/requirements.txt`, quatro dos seis modelos candidatos (Holt, ARIMA, Winters e
-  Theta) falham na chamada e são descartados pela seleção; hoje apenas AutoARIMA e
-  Croston competem. A correção é pequena (parâmetros incompatíveis com a API atual do
-  statsmodels e nome de coluna do statsforecast), mas altera os números de forecast
-  gerados, então será feita com uma comparação antes/depois sobre dados reais.
 - **Testes sem banco** — a suíte cobre lógica pura; os fluxos que passam pelo Prisma
   ainda são validados manualmente contra a API.
 - **Validação de payload parcial** — as demais rotas da UI (forecast, orçamento,
