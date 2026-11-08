@@ -10,6 +10,27 @@ assistida por IA.
 > são inteiramente fictícios e gerados por script de seed — não há nenhum dado real
 > de nenhuma empresa neste repositório.
 
+![Consolidado: Orçado × Forecast × Vendas por divisão, com acurácia e viés](docs/screenshots/sales-forecast-consolidado.jpg)
+
+<details>
+<summary><b>Mais telas</b></summary>
+
+<br>
+
+**Aprovações:** revisão e aprovação das submissões de cada unidade pelo PCP
+
+![Aprovações](docs/screenshots/sales-forecast-aprovacoes.jpg)
+
+**Meu Forecast:** visão do gestor da unidade, com status do ciclo, preenchimento e Orçado × Forecast por produto
+
+![Meu Forecast](docs/screenshots/sales-forecast-meu-forecast.jpg)
+
+**Mobile:** interface responsiva
+
+<img src="docs/screenshots/sales-forecast-mobile.jpg" alt="Versão mobile" width="320">
+
+</details>
+
 ## O problema que o sistema resolve
 
 Empresas com múltiplas unidades/divisões de vendas costumam consolidar previsões
