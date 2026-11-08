@@ -189,3 +189,25 @@ class TestProcessarGrupo:
             monkeypatch.setattr(fr, f"treinar_{nome}", lambda *a: None)
         out = fr.processar_grupo(_args(_grupo()))
         assert (out["falhados"], out["results"]) == (1, [])
+
+
+# ── Modelos reais (sem substituição) ─────────────────────────────────────────
+
+# Série sazonal sintética bem comportada: todo modelo candidato deve conseguir ajustá-la.
+# Regressão: Holt, ARIMA e Winters chamavam fit(maxiter=...), que a API atual do statsmodels
+# não aceita, e o Theta lia uma coluna inexistente — os 4 eram descartados em toda série
+# sem nenhum erro visível, e só AutoARIMA e Croston competiam.
+_SAZONAL = np.tile([100, 95, 110, 105, 120, 130, 125, 115, 110, 140, 160, 220], 3).astype(float)
+_SERIE = pd.Series(_SAZONAL * np.linspace(1, 1.2, 36), index=pd.date_range("2023-06-01", periods=36, freq="MS"))
+_SERIE.index.freq = "MS"
+
+
+@pytest.mark.parametrize("treinador", ["holt", "arima", "autoarima", "winters", "theta", "croston"])
+def test_todo_modelo_candidato_produz_previsao_valida(treinador):
+    treino, teste = _SERIE.iloc[:fr.MESES_TREINO], _SERIE.iloc[fr.MESES_TREINO:]
+    resultado = getattr(fr, f"treinar_{treinador}")(treino, teste, datetime(2026, 9, 1))
+
+    assert resultado is not None, f"{treinador} falhou numa série bem comportada"
+    assert np.isfinite(resultado["smape"])
+    assert len(resultado["previsao"]) == fr.MESES_PREVISAO
+    assert all(np.isfinite(float(v)) for _, v in resultado["previsao"])

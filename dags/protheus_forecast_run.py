@@ -74,6 +74,41 @@ logger = logging.getLogger(__name__)
 
 # ── Motor de Previsão ─────────────────────────────────────────────────────────
 
+# Limite de iterações do otimizador. Na API atual do statsmodels (0.14) o `fit()` não
+# aceita `maxiter` diretamente — passá-lo assim lançava TypeError e o modelo era
+# descartado em todas as séries. Holt/Winters repassam ao scipy.optimize.minimize;
+# ARIMA (tsa.arima.model) repassa ao otimizador do modelo de espaço de estados.
+MAXITER_OTIMIZADOR = 50
+
+
+# Funções (e não dicts constantes) de propósito: o ARIMA.fit() acrescenta chaves ao
+# method_kwargs recebido; um dict compartilhado faria o segundo fit (série completa)
+# falhar com "Cannot override model level value".
+def _hw_fit_kwargs() -> Dict:
+    return {"minimize_kwargs": {"options": {"maxiter": MAXITER_OTIMIZADOR}}}
+
+
+def _arima_fit_kwargs() -> Dict:
+    return {"method_kwargs": {"maxiter": MAXITER_OTIMIZADOR}}
+
+
+_modelos_com_falha_logada: set = set()
+
+
+def _log_falha_modelo(modelo: str, exc: Exception) -> None:
+    """Registra a primeira falha de cada modelo neste processo.
+
+    Falhas pontuais (ex.: série que não converge) são esperadas e o modelo só é
+    descartado daquela série; o log existe para que uma falha sistemática — o modelo
+    quebrando em toda série — não passe despercebida.
+    """
+    if modelo in _modelos_com_falha_logada:
+        return
+    _modelos_com_falha_logada.add(modelo)
+    logger.warning("[modelo %s] descartado por erro (só a 1ª ocorrência é registrada): %s: %s",
+                   modelo, type(exc).__name__, str(exc)[:200])
+
+
 def calcular_smape(real: np.ndarray, previsto: np.ndarray) -> float:
     """sMAPE — Symmetric Mean Absolute Percentage Error (0–200%).
     Lida com zeros sem gerar infinito, adequado para demanda intermitente.
@@ -113,25 +148,27 @@ def _datas_previsao(data_inicio: datetime) -> List[str]:
 
 def treinar_holt(treino: pd.Series, teste: pd.Series, dt_inicio: datetime) -> Optional[Dict]:
     try:
-        m = Holt(treino, damped_trend=True).fit(maxiter=50)
+        m = Holt(treino, damped_trend=True).fit(**_hw_fit_kwargs())
         smape = calcular_smape(teste.values, m.forecast(MESES_TESTE).values)
-        mf = Holt(pd.concat([treino, teste]), damped_trend=True).fit(maxiter=50)
+        mf = Holt(pd.concat([treino, teste]), damped_trend=True).fit(**_hw_fit_kwargs())
         prev = np.clip(mf.forecast(MESES_PREVISAO).values, 0, None)
         return {"modelo": "Holt", "smape": smape,
                 "previsao": list(zip(_datas_previsao(dt_inicio), prev))}
-    except Exception:
+    except Exception as exc:
+        _log_falha_modelo("Holt", exc)
         return None
 
 
 def treinar_arima(treino: pd.Series, teste: pd.Series, dt_inicio: datetime) -> Optional[Dict]:
     try:
-        m = ARIMA(treino, order=(1, 2, 3), trend="n").fit(maxiter=50)
+        m = ARIMA(treino, order=(1, 2, 3), trend="n").fit(**_arima_fit_kwargs())
         smape = calcular_smape(teste.values, m.forecast(MESES_TESTE).values)
-        mf = ARIMA(pd.concat([treino, teste]), order=(1, 2, 3), trend="n").fit(maxiter=50)
+        mf = ARIMA(pd.concat([treino, teste]), order=(1, 2, 3), trend="n").fit(**_arima_fit_kwargs())
         prev = np.clip(mf.forecast(MESES_PREVISAO).values, 0, None)
         return {"modelo": "ARIMA(1,2,3)", "smape": smape,
                 "previsao": list(zip(_datas_previsao(dt_inicio), prev))}
-    except Exception:
+    except Exception as exc:
+        _log_falha_modelo("ARIMA(1,2,3)", exc)
         return None
 
 
@@ -165,7 +202,8 @@ def treinar_autoarima(treino: pd.Series, teste: pd.Series, dt_inicio: datetime) 
         prev = np.clip(mf.predict(n_periods=MESES_PREVISAO), 0, None)
         return {"modelo": "AutoARIMA", "smape": smape,
                 "previsao": list(zip(_datas_previsao(dt_inicio), prev))}
-    except Exception:
+    except Exception as exc:
+        _log_falha_modelo("AutoARIMA", exc)
         return None
 
 
@@ -176,7 +214,7 @@ def treinar_winters(treino: pd.Series, teste: pd.Series, dt_inicio: datetime) ->
     def _fit(serie: pd.Series, seasonal: str):
         return ExponentialSmoothing(
             serie, trend="add", seasonal=seasonal, seasonal_periods=12
-        ).fit(maxiter=50)
+        ).fit(**_hw_fit_kwargs())
 
     try:
         try:
@@ -194,7 +232,8 @@ def treinar_winters(treino: pd.Series, teste: pd.Series, dt_inicio: datetime) ->
         prev = np.clip(mf.forecast(MESES_PREVISAO).values, 0, None)
         return {"modelo": "Winters", "smape": smape,
                 "previsao": list(zip(_datas_previsao(dt_inicio), prev))}
-    except Exception:
+    except Exception as exc:
+        _log_falha_modelo("Winters", exc)
         return None
 
 
@@ -210,7 +249,7 @@ def treinar_theta(treino: pd.Series, teste: pd.Series, dt_inicio: datetime) -> O
     """Modelo Theta — vencedor da competição M3; robusto para séries curtas."""
     try:
         sf_treino = StatsForecast(
-            models=[ThetaModel(season_length=12)], freq="MS", verbose=False
+            models=[ThetaModel(season_length=12, alias="ThetaModel")], freq="MS", verbose=False
         )
         sf_treino.fit(_statsforecast_df(treino))
         prev_teste = sf_treino.predict(h=MESES_TESTE)["ThetaModel"].values
@@ -218,13 +257,14 @@ def treinar_theta(treino: pd.Series, teste: pd.Series, dt_inicio: datetime) -> O
 
         serie_completa = pd.concat([treino, teste])
         sf_final = StatsForecast(
-            models=[ThetaModel(season_length=12)], freq="MS", verbose=False
+            models=[ThetaModel(season_length=12, alias="ThetaModel")], freq="MS", verbose=False
         )
         sf_final.fit(_statsforecast_df(serie_completa))
         prev = np.clip(sf_final.predict(h=MESES_PREVISAO)["ThetaModel"].values, 0, None)
         return {"modelo": "Theta", "smape": smape,
                 "previsao": list(zip(_datas_previsao(dt_inicio), prev))}
-    except Exception:
+    except Exception as exc:
+        _log_falha_modelo("Theta", exc)
         return None
 
 
@@ -246,7 +286,8 @@ def treinar_croston(treino: pd.Series, teste: pd.Series, dt_inicio: datetime) ->
         prev = np.clip(sf_final.predict(h=MESES_PREVISAO)["CrostonOptimized"].values, 0, None)
         return {"modelo": "Croston", "smape": smape,
                 "previsao": list(zip(_datas_previsao(dt_inicio), prev))}
-    except Exception:
+    except Exception as exc:
+        _log_falha_modelo("Croston", exc)
         return None
 
 
